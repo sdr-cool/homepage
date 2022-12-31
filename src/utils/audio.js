@@ -46,7 +46,6 @@ function Player() {
       squelchTime = lastPlayedAt;
     }
     if (squelchTime === null || lastPlayedAt - squelchTime < SQUELCH_TAIL) {
-      console.log(111)
       buffer.getChannelData(0).set(leftSamples);
       buffer.getChannelData(1).set(rightSamples);
       if (wavSaver != null) {
