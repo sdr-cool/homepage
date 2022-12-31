@@ -12,7 +12,7 @@ const device = ref('')
 const totalReceived = ref(0)
 const freq = 94.5 * 1e6
 const SAMPLE_RATE = 1024 * 1e3 // Must be a multiple of 512 * BUFS_PER_SEC
-const BUFS_PER_SEC = 5
+const BUFS_PER_SEC = 20
 const SAMPLES_PER_BUF = Math.floor(SAMPLE_RATE / BUFS_PER_SEC)
 
 async function connect() {
@@ -25,7 +25,7 @@ async function connect() {
   await sdr.resetBuffer()
   while (device.value) {
     const samples = await sdr.readSamples(SAMPLES_PER_BUF)
-    postMessage({ type: 'samples', samples })
+    postMessage({ type: 'samples', samples, ts: Date.now() })
   }
 }
 
@@ -37,7 +37,7 @@ window.addEventListener('message', ({ data }) => {
       let [left, right] = decoder.process(samples, true, 0)
       left = new Float32Array(left);
       right = new Float32Array(right);
-      player.play(left, right, 50, 30)
+      player.play(left, right, 40, 20);
       break;
   }
 })

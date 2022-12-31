@@ -18,7 +18,7 @@
  */
 function Player() {
   var OUT_RATE = 48000;
-  var TIME_BUFFER = 0.05;
+  var TIME_BUFFER = 0.01;
   var SQUELCH_TAIL = 0.3;
 
   var lastPlayedAt = -1;
