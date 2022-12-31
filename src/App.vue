@@ -1,23 +1,30 @@
 <script setup>
 import { ref } from 'vue'
 import { connect as connectSdr, getDeviceName } from  './utils/sdr'
+import Decoder from './utils/decode-worker'
 
 let sdr = null
 const device = ref('')
 const totalReceived = ref(0)
+const freq = 88.7 * 1e6
 
 async function connect() {
+  const decoder = new Decoder()
+
   sdr = await connectSdr()
   device.value = getDeviceName(sdr)
 
   await sdr.open({ ppm: 0.5 })
   await sdr.setSampleRate(2400000)
-  await sdr.setCenterFrequency(88.7 * 1e6)
+  await sdr.setCenterFrequency(freq)
   await sdr.resetBuffer()
   await sdr.readSamples(16 * 16384)
   while (device.value) {
     const samples = await sdr.readSamples(16 * 16384)
     totalReceived.value += samples.byteLength
+
+    const processed = decoder.process(samples, true, 0)
+    console.log(processed)
   }
 }
 
