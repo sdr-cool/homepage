@@ -1,16 +1,11 @@
 import RtlSdr from 'rtlsdrjs'
 
-class Sdr {
-  constructor() {
-  }
-
-  async connect() {
-    self._sdr = await RtlSdr.requestDevice()
-  }
-
-  get device() {
-    return self._sdr._usbDevice._device.productName
-  }
+async function connect() {
+  return await RtlSdr.requestDevice()
 }
 
-export default Sdr;
+function getDeviceName(sdr) {
+  return sdr._usbDevice._device.productName
+}
+
+export { connect, getDeviceName }
