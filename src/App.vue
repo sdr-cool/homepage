@@ -5,36 +5,46 @@ import Decoder from './utils/decode-worker'
 import Player from './utils/audio'
 
 let sdr = null
+const decoder = new Decoder()
+const player = new Player()
+
 const device = ref('')
 const totalReceived = ref(0)
-const freq = 88.7 * 1e6
+const freq = 94.5 * 1e6
+const SAMPLE_RATE = 1024 * 1e3 // Must be a multiple of 512 * BUFS_PER_SEC
+const BUFS_PER_SEC = 5
+const SAMPLES_PER_BUF = Math.floor(SAMPLE_RATE / BUFS_PER_SEC)
 
 async function connect() {
-  const decoder = new Decoder()
-  const player = new Player()
-
   sdr = await connectSdr()
   device.value = getDeviceName(sdr)
 
   await sdr.open({ ppm: 0.5 })
-  await sdr.setSampleRate(2400000)
+  await sdr.setSampleRate(SAMPLE_RATE)
   await sdr.setCenterFrequency(freq)
   await sdr.resetBuffer()
-  await sdr.readSamples(16 * 16384)
   while (device.value) {
-    const samples = await sdr.readSamples(16 * 16384)
-    totalReceived.value += samples.byteLength
-
-    let [left, right] = decoder.process(samples, true, 0)
-    left = new Float32Array(left);
-    right = new Float32Array(right);
-    player.play(left, right, 99, 30)
+    const samples = await sdr.readSamples(SAMPLES_PER_BUF)
+    postMessage({ type: 'samples', samples })
   }
 }
 
+window.addEventListener('message', ({ data }) => {
+  switch (data.type) {
+    case 'samples':
+      const samples = data.samples
+      totalReceived.value += samples.byteLength
+      let [left, right] = decoder.process(samples, true, 0)
+      left = new Float32Array(left);
+      right = new Float32Array(right);
+      player.play(left, right, 50, 30)
+      break;
+  }
+})
+
 async function disconnect() {
   device.value = ''
-  await new Promise(r => setTimeout(r, 100))
+  await new Promise(r => setTimeout(r, 200))
   sdr.close()
   sdr = null
 }
