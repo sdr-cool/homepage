@@ -4,6 +4,7 @@ import { connect as connectSdr, getDeviceName } from  './utils/sdr'
 
 let sdr = null
 const device = ref('')
+const totalReceived = ref(0)
 
 async function connect() {
   sdr = await connectSdr()
@@ -16,7 +17,7 @@ async function connect() {
   await sdr.readSamples(16 * 16384)
   while (device.value) {
     const samples = await sdr.readSamples(16 * 16384)
-    console.log(samples)
+    totalReceived.value += samples.byteLength
   }
 }
 
@@ -30,7 +31,7 @@ async function disconnect() {
 
 <template>
 <div>
-{{ device }}
+{{ device }} {{ (totalReceived / 1024 / 1024).toFixed(2) }}MB
 </div>
 <button @click="connect" v-if="!device">连接</button>
 <button @click="disconnect" v-if="device">断开</button>
