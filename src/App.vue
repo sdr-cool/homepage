@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { connect as connectSdr, getDeviceName } from  './utils/sdr'
 import Decoder from './utils/decode-worker'
+import Player from './utils/audio'
 
 let sdr = null
 const device = ref('')
@@ -10,6 +11,7 @@ const freq = 88.7 * 1e6
 
 async function connect() {
   const decoder = new Decoder()
+  const player = new Player()
 
   sdr = await connectSdr()
   device.value = getDeviceName(sdr)
@@ -23,8 +25,10 @@ async function connect() {
     const samples = await sdr.readSamples(16 * 16384)
     totalReceived.value += samples.byteLength
 
-    const processed = decoder.process(samples, true, 0)
-    console.log(processed)
+    let [left, right] = decoder.process(samples, true, 0)
+    left = new Float32Array(left);
+    right = new Float32Array(right);
+    player.play(left, right, 99, 30)
   }
 }
 
@@ -38,7 +42,7 @@ async function disconnect() {
 
 <template>
 <div>
-{{ device }} {{ (totalReceived / 1024 / 1024).toFixed(2) }}MB
+{{ device }} Total received:{{ (totalReceived / 1024 / 1024).toFixed(2) }}MB
 </div>
 <button @click="connect" v-if="!device">连接</button>
 <button @click="disconnect" v-if="device">断开</button>
