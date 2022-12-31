@@ -10,7 +10,8 @@ const player = new Player()
 
 const device = ref('')
 const totalReceived = ref(0)
-const freq = 94.5 * 1e6
+const processedData = ref(0)
+const freq = 88.7 * 1e6
 const SAMPLE_RATE = 1024 * 1e3 // Must be a multiple of 512 * BUFS_PER_SEC
 const BUFS_PER_SEC = 20
 const SAMPLES_PER_BUF = Math.floor(SAMPLE_RATE / BUFS_PER_SEC)
@@ -35,6 +36,7 @@ window.addEventListener('message', ({ data }) => {
       const samples = data.samples
       totalReceived.value += samples.byteLength
       let [left, right] = decoder.process(samples, true, 0)
+      processedData.value += left.byteLength + right.byteLength
       left = new Float32Array(left);
       right = new Float32Array(right);
       player.play(left, right, 40, 20);
@@ -52,7 +54,7 @@ async function disconnect() {
 
 <template>
 <div>
-{{ device }} Total received:{{ (totalReceived / 1024 / 1024).toFixed(2) }}MB
+{{ device }} Total received:{{ (totalReceived / 1024 / 1024).toFixed(2) }}MB, Processed:{{ (processedData / 1024 / 1024).toFixed(2) }}MB
 </div>
 <button @click="connect" v-if="!device">连接</button>
 <button @click="disconnect" v-if="device">断开</button>
