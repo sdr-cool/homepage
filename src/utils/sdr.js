@@ -22,12 +22,12 @@ export const device = ref('')
 export const totalReceived = ref(0)
 export const processedData = ref(0)
 
-async function connect() {
+export async function connect() {
   sdr = await RtlSdr.requestDevice()
   device.value = sdr._usbDevice._device.productName
 }
 
-async function disconnect() {
+export async function disconnect() {
   const toClose = sdr
   sdr = null
   device.value = ''
@@ -37,7 +37,7 @@ async function disconnect() {
 
 let frequencyChanging = false
 
-async function receive() {
+export async function receive() {
   decoder = decoder || new Decoder()
   player = player || new Player()
   await sdr.open({ ppm: 0.5 })
@@ -46,7 +46,7 @@ async function receive() {
   await sdr.resetBuffer()
   while (sdr) {
     if (frequencyChanging) {
-      await new Promise(r => setTimeout(r, 10))
+      await new Promise(r => setTimeout(r, 1))
       continue
     }
 
@@ -112,5 +112,3 @@ window.addEventListener('message', ({ data }) => {
       break;
   }
 })
-
-export { connect, disconnect, receive }
