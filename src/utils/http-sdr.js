@@ -24,6 +24,28 @@ export async function connect() {
       signalLevel.value = dv.getFloat64(sz * 2)
       latency.value = Date.now() - dv.getFloat64(sz * 2 + 8)
       const freqR = dv.getUint32(sz * 2 + 16)
+
+      const sl = signalLevel.value
+      if (frequency.value + tuningFreq.value === freqR) {
+        if (sl > 0.5 && tuningFreq.value !== 0) {
+          frequency.value = frequency.value + tuningFreq.value
+          tuningFreq.value = 0
+        } else if (tuningFreq.value > 0) {
+          if (tuningFreq.value < 300000) {
+            tuningFreq.value += 100000
+          } else {
+            frequency.value = frequency.value + tuningFreq.value
+            tuningFreq.value = 100000
+          }
+        } else if (tuningFreq.value < 0) {
+          if (tuningFreq.value > -300000) {
+            tuningFreq.value -= 100000
+          } else {
+            frequency.value = frequency.value + tuningFreq.value
+            tuningFreq.value = -100000
+          }
+        }
+      }
     } else {
       const info = JSON.parse(data)
       mode.value = info.mode
