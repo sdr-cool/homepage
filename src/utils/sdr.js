@@ -7,6 +7,8 @@ import Player from './audio'
 const SAMPLE_RATE = 1024 * 1e3 // Must be a multiple of 512 * BUFS_PER_SEC
 const BUFS_PER_SEC = 16
 const SAMPLES_PER_BUF = Math.floor(SAMPLE_RATE / BUFS_PER_SEC)
+const MIN_FREQ = 1e6
+const MAX_FREQ = 8e8
 
 let sdr = null
 let decoder = null
@@ -58,7 +60,15 @@ async function receive() {
 watch(frequency, async newFreq => {
   try {
     frequencyChanging = true
-    await sdr.setCenterFrequency(newFreq)
+    if (newFreq < MIN_FREQ) {
+      frequency.value = MIN_FREQ
+      tuningFreq.value = 0
+    } else if (newFreq > MAX_FREQ) {
+      frequency.value = MAX_FREQ
+      tuningFreq.value = 0
+    } else {
+      await sdr.setCenterFrequency(newFreq)
+    }
   } finally {
     frequencyChanging = false
   }
