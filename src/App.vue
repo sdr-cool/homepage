@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { connect as connectSdr, disconnect, receive, device, frequency, signalLevel, totalReceived, processedData } from  './utils/sdr'
+import { connect as connectSdr, disconnect, receive, device, frequency, tuningFreq, signalLevel, totalReceived, processedData } from  './utils/sdr'
 
 const error = ref(null)
 const debug = ref(false)
@@ -31,11 +31,11 @@ function size(sz) {
 <div class="panel">
   <div class="left">
     <button :disabled="!device" @click="frequency -= 100000">‹</button>
-    <button :disabled="!device">«</button>
+    <button :disabled="!device" @click="tuningFreq -= 100000">«</button>
   </div>
   <div class="cennter_console">
     <div v-if="!error && device" class="radio_info">
-      <div class="freq">{{ (frequency / 1e6).toFixed(1) }}</div>
+      <div class="freq">{{ ((frequency + tuningFreq) / 1e6).toFixed(1) }}</div>
       <div class="mode">FM</div>
       <div class="signal_level">
         <div class="bar" :style="{ height: signalLevel * 100 + '%'  }"></div>
@@ -47,7 +47,7 @@ function size(sz) {
   </div>
   <div class="right">
     <button :disabled="!device" @click="frequency += 100000">›</button>
-    <button :disabled="!device">»</button>
+    <button :disabled="!device" @click="tuningFreq += 100000">»</button>
   </div>
   <div class="bottom">
     <div>

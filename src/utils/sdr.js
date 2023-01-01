@@ -5,7 +5,7 @@ import Decoder from './decode-worker'
 import Player from './audio'
 
 const SAMPLE_RATE = 1024 * 1e3 // Must be a multiple of 512 * BUFS_PER_SEC
-const BUFS_PER_SEC = 20
+const BUFS_PER_SEC = 16
 const SAMPLES_PER_BUF = Math.floor(SAMPLE_RATE / BUFS_PER_SEC)
 
 let sdr = null
@@ -13,6 +13,7 @@ let decoder = null
 let player = null
 
 export const frequency = ref(88.7 * 1e6)
+export const tuningFreq = ref(0)
 export const signalLevel = ref(0)
 export const device = ref('')
 export const totalReceived = ref(0)
@@ -46,8 +47,11 @@ async function receive() {
       continue
     }
 
+    const currentFreq = frequency.value
     const samples = await sdr.readSamples(SAMPLES_PER_BUF)
-    if (samples.byteLength > 0) postMessage({ type: 'samples', samples, ts: Date.now() })
+    if (samples.byteLength > 0) {
+      postMessage({ type: 'samples', samples, ts: Date.now(), frequency: currentFreq })
+    }
   }
 }
 
@@ -55,7 +59,6 @@ watch(frequency, async newFreq => {
   try {
     frequencyChanging = true
     await sdr.setCenterFrequency(newFreq)
-    await sdr.resetBuffer()
   } finally {
     frequencyChanging = false
   }
@@ -66,7 +69,29 @@ window.addEventListener('message', ({ data }) => {
     case 'samples':
       const samples = data.samples
       totalReceived.value += samples.byteLength
-      let [left, right, sl] = decoder.process(samples, true, 0)
+      let [left, right, sl] = decoder.process(samples, true, -tuningFreq.value)
+
+      if (frequency.value === data.frequency) {
+        if (sl > 0.5 && tuningFreq.value !== 0) {
+          frequency.value = frequency.value + tuningFreq.value
+          tuningFreq.value = 0
+        } else if (tuningFreq.value > 0) {
+          if (tuningFreq.value < 300000) {
+            tuningFreq.value += 100000
+          } else {
+            frequency.value = frequency.value + tuningFreq.value
+            tuningFreq.value = 100000
+          }
+        } else if (tuningFreq.value < 0) {
+          if (tuningFreq.value > -300000) {
+            tuningFreq.value -= 100000
+          } else {
+            frequency.value = frequency.value + tuningFreq.value
+            tuningFreq.value = -100000
+          }
+        }
+      }
+
       signalLevel.value = sl
       processedData.value += left.byteLength + right.byteLength
       left = new Float32Array(left);
