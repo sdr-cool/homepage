@@ -41,6 +41,9 @@ function size(sz) {
         <div class="bar" :style="{ height: signalLevel * 100 + '%'  }"></div>
       </div>
     </div>
+    <div v-if="error" class="error">
+      ERROR
+    </div>
   </div>
   <div class="right">
     <button>›</button>
@@ -49,7 +52,7 @@ function size(sz) {
   <div class="bottom">
     <div>
       <button @click="connect" v-if="!device">⏼</button>
-      <button @click="disconnect" v-if="device">⏼</button>
+      <button @click="disconnect" v-if="device" class="active">⏼</button>
     </div>
     <div class="center">
       {{ device }}
@@ -114,6 +117,11 @@ function size(sz) {
     button {
       padding: 10px 0;
       width: 40px;
+
+      &.active {
+        background-color: #ccc;
+        color: #666;
+      }
     }
   }
 
@@ -137,6 +145,19 @@ function size(sz) {
     flex-grow: 2;
     // min-width: 220px;
     height: 80px;
+
+    .error {
+        line-height: 80px;
+        font-size: 20px;
+        font-weight: bold;
+        animation: blinker 1s linear infinite;
+    }
+
+    @keyframes blinker {
+      50% {
+        opacity: 0;
+      }
+    }
 
     .radio_info {
       position: relative;
