@@ -5,7 +5,8 @@ import { mode, frequency, tuningFreq, latency, signalLevel, device, totalReceive
 let ws = null
 let player = null
 
-const url = 'ws://localhost:3000/data'
+// const url = 'ws://localhost:3000/data'
+const url = `ws://${location.host}/data`
 
 export async function connect() {
   player = player || new Player()
