@@ -21,7 +21,6 @@ export const latency = ref(0)
 export const signalLevel = ref(0)
 export const device = ref('')
 export const totalReceived = ref(0)
-export const processedData = ref(0)
 
 export async function connect() {
   sdr = await RtlSdr.requestDevice()
@@ -115,7 +114,6 @@ window.addEventListener('message', ({ data }) => {
       }
 
       signalLevel.value = sl
-      processedData.value += left.byteLength + right.byteLength
       left = new Float32Array(left);
       right = new Float32Array(right);
       player.play(left, right, signalLevel.value, 0.15);
