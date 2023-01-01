@@ -34,7 +34,7 @@ function size(sz) {
     <button>«</button>
   </div>
   <div class="cennter_console">
-    <div v-if="!error" class="radio_info">
+    <div v-if="!error && device" class="radio_info">
       <div class="freq">{{ (frequency / 1e6).toFixed(1) }}</div>
       <div class="mode">FM</div>
       <div class="signal_level">
@@ -61,13 +61,13 @@ function size(sz) {
   </div>
   <div class="debug" v-if="debug">
     <div>Data: {{ size(totalReceived) }}</div>
+    <p v-if="error">
+      <pre v-if="!error.stack">{{ error }}</pre>
+      <pre v-if="error.stack">{{ error.stack }}</pre>
+    </p>
   </div>
 </div>
 
-<p v-if="error">
-  <pre v-if="!error.stack">{{ error }}</pre>
-  <pre v-if="error.stack">{{ error.stack }}</pre>
-</p>
 </template>
 
 <style scoped lang="scss">
@@ -122,7 +122,13 @@ function size(sz) {
     width: 100%;
     background-color: #364334;
     color: #bdfcdf;
-    padding: 10px 0;
+    padding: 10px 5px;
+
+    pre {
+      text-align: left;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
   }
   
   .cennter_console {
