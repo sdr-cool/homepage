@@ -1,54 +1,18 @@
 <script setup>
 import { ref } from 'vue'
-import { connect as connectSdr, getDeviceName } from  './utils/sdr'
-import Decoder from './utils/decode-worker'
-import Player from './utils/audio'
+import { connect as connectSdr, disconnect, receive, device, frequency, totalReceived, processedData } from  './utils/sdr'
 
-let sdr = null
-const decoder = new Decoder()
-const player = new Player()
-
-const device = ref('')
-const totalReceived = ref(0)
-const processedData = ref(0)
-const freq = 88.7 * 1e6
-const SAMPLE_RATE = 1024 * 1e3 // Must be a multiple of 512 * BUFS_PER_SEC
-const BUFS_PER_SEC = 20
-const SAMPLES_PER_BUF = Math.floor(SAMPLE_RATE / BUFS_PER_SEC)
+const error = ref(null)
 
 async function connect() {
-  sdr = await connectSdr()
-  device.value = getDeviceName(sdr)
-
-  await sdr.open({ ppm: 0.5 })
-  await sdr.setSampleRate(SAMPLE_RATE)
-  await sdr.setCenterFrequency(freq)
-  await sdr.resetBuffer()
-  while (device.value) {
-    const samples = await sdr.readSamples(SAMPLES_PER_BUF)
-    postMessage({ type: 'samples', samples, ts: Date.now() })
+  error.value = null
+  try {
+    await connectSdr()
+    receive().catch(e => error.value = e)
+  } catch (e) {
+    error.value = e
+    console.log(e.message)
   }
-}
-
-window.addEventListener('message', ({ data }) => {
-  switch (data.type) {
-    case 'samples':
-      const samples = data.samples
-      totalReceived.value += samples.byteLength
-      let [left, right] = decoder.process(samples, true, 0)
-      processedData.value += left.byteLength + right.byteLength
-      left = new Float32Array(left);
-      right = new Float32Array(right);
-      player.play(left, right, 40, 20);
-      break;
-  }
-})
-
-async function disconnect() {
-  device.value = ''
-  await new Promise(r => setTimeout(r, 200))
-  sdr.close()
-  sdr = null
 }
 </script>
 
@@ -58,6 +22,11 @@ async function disconnect() {
 </div>
 <button @click="connect" v-if="!device">连接</button>
 <button @click="disconnect" v-if="device">断开</button>
+
+<p v-if="error">
+  <pre v-if="!error.stack">{{ error }}</pre>
+  <pre v-if="error.stack">{{ error.stack }}</pre>
+</p>
 </template>
 
 <style scoped>
