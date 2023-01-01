@@ -44,16 +44,16 @@ function Decoder() {
    * @param {Object=} opt_data Additional data to echo back to the caller.
    */
   function process(buffer, inStereo, freqOffset, opt_data) {
-    var data = opt_data || {};
+    // var data = opt_data || {};
     var IQ = iqSamplesFromUint8(buffer, IN_RATE);
     IQ = shiftFrequency(IQ, freqOffset, IN_RATE, cosine, sine);
     cosine = IQ[2];
     sine = IQ[3];
     var out = demodulator.demodulate(IQ[0], IQ[1], inStereo);
-    data['stereo'] = out['stereo'];
-    data['signalLevel'] = out['signalLevel'];
+    // data['stereo'] = out['stereo'];
+    // data['signalLevel'] = out['signalLevel'];
     // postMessage([out.left, out.right, data], [out.left, out.right]);
-    return [out.left, out.right]
+    return [out.left, out.right, out['signalLevel'], out['stereo']]
   }
 
   /**
