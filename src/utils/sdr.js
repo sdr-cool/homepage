@@ -29,8 +29,6 @@ export async function disconnect() {
   toClose.close()
 }
 
-let frequencyChanging = false
-
 export async function receive() {
   decoder = decoder || new Decoder()
   decoder.setMode(mode.value)
@@ -42,13 +40,9 @@ export async function receive() {
   await sdr.resetBuffer()
   let currentFreq = frequency.value
   while (sdr) {
-    if (frequencyChanging) {
-      await new Promise(r => setTimeout(r, 1))
-      continue
-    }
-
     if (currentFreq !== frequency.value) {
       currentFreq = frequency.value
+      await sdr.setCenterFrequency(frequency.value)
       await sdr.resetBuffer()
     }
     const samples = await sdr.readSamples(SAMPLES_PER_BUF)
@@ -59,19 +53,12 @@ export async function receive() {
 }
 
 watch(frequency, async newFreq => {
-  try {
-    frequencyChanging = true
-    if (newFreq < MIN_FREQ) {
-      frequency.value = MIN_FREQ
-      tuningFreq.value = 0
-    } else if (newFreq > MAX_FREQ) {
-      frequency.value = MAX_FREQ
-      tuningFreq.value = 0
-    } else {
-      await sdr.setCenterFrequency(newFreq)
-    }
-  } finally {
-    frequencyChanging = false
+  if (newFreq < MIN_FREQ) {
+    frequency.value = MIN_FREQ
+    tuningFreq.value = 0
+  } else if (newFreq > MAX_FREQ) {
+    frequency.value = MAX_FREQ
+    tuningFreq.value = 0
   }
 })
 

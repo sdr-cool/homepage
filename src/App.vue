@@ -1,11 +1,11 @@
 <script setup>
 import { ref } from 'vue'
 import { mode, frequency, tuningFreq, latency, signalLevel, device, totalReceived } from './utils/sdr-vals'
-import { connect as connectSdr, disconnect, receive } from  './utils/http-sdr'
+import { connect as connectSdr, disconnect, receive } from  './utils/sdr'
 import ModeDialog from './components/ModeDialog.vue';
 
 const error = ref(null)
-const debug = ref(false)
+const debug = ref(true)
 const showModeDialog = ref(false)
 
 async function connect() {
@@ -62,10 +62,10 @@ function size(sz) {
     <div class="center">
       {{ device }}
     </div>
-    <div>
+    <!-- <div>
       <button v-if="!debug" @click="debug = true">▼</button>
       <button v-if="debug" @click="debug = false">▶</button>
-    </div>
+    </div> -->
   </div>
   <div class="debug" v-if="debug">
     <div>Data: {{ size(totalReceived) }}, latency: {{ latency }}ms</div>
