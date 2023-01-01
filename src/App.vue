@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { connect as connectSdr, disconnect, receive, device, frequency, signalLevel, totalReceived, processedData } from  './utils/sdr'
 
 const error = ref(null)
+const debug = ref(false)
 
 async function connect() {
   error.value = null
@@ -14,12 +15,23 @@ async function connect() {
     console.log(e.message)
   }
 }
+
+function size(sz) {
+  sz /= 1024 * 1024
+  if (sz > 1024) {
+    sz /= 1024
+    return `${sz.toFixed(3)}GB`
+  } else {
+    return `${sz.toFixed(1)}MB`
+  }
+}
 </script>
 
 <template>
 <div class="panel">
   <div class="left">
-    <button>asdf</button>
+    <button>‹</button>
+    <button>«</button>
   </div>
   <div class="cennter_console">
     <div v-if="!error" class="radio_info">
@@ -31,11 +43,24 @@ async function connect() {
     </div>
   </div>
   <div class="right">
-    <button>asdf</button>
+    <button>›</button>
+    <button>»</button>
   </div>
   <div class="bottom">
-    <button @click="connect" v-if="!device">连接</button>
-    <button @click="disconnect" v-if="device">断开</button>
+    <div>
+      <button @click="connect" v-if="!device">⏼</button>
+      <button @click="disconnect" v-if="device">⏼</button>
+    </div>
+    <div class="center">
+      {{ device }}
+    </div>
+    <div>
+      <button v-if="!debug" @click="debug = true">▼</button>
+      <button v-if="debug" @click="debug = false">▶</button>
+    </div>
+  </div>
+  <div class="debug" v-if="debug">
+    <div>Data: {{ size(totalReceived) }}</div>
   </div>
 </div>
 
@@ -49,13 +74,55 @@ async function connect() {
 .panel {
   border-radius: 5px;
   box-shadow: 1px 1px 3px 3px #888;
-  padding: 10px;
+  padding: 10px 5px;
   display: flex;
   background-color: #dddddd;
   flex-wrap: wrap;
 
+  .left, .right {
+    button {
+      display: block;
+      width: 20px;
+      height: 20px;
+      line-height: 0;
+      padding: 18px 20px;
+    }
+
+    :first-child {
+      margin-bottom: 4px;
+    }
+  }
+
+  .left {
+    padding-right: 5px;
+  }
+
+  .right {
+    padding-left: 5px;
+  }
+
   .bottom {
     width: 100%;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+
+    .center {
+      flex-grow: 1;
+    }
+
+    button {
+      padding: 10px 0;
+      width: 40px;
+    }
+  }
+
+  .debug {
+    margin-top: 10px;
+    width: 100%;
+    background-color: #364334;
+    color: #bdfcdf;
+    padding: 10px 0;
   }
   
   .cennter_console {
