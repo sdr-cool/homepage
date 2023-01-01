@@ -118,7 +118,7 @@ window.addEventListener('message', ({ data }) => {
       processedData.value += left.byteLength + right.byteLength
       left = new Float32Array(left);
       right = new Float32Array(right);
-      player.play(left, right, signalLevel.value * 100, signalLevel.value * 10);
+      player.play(left, right, signalLevel.value, signalLevel.value / 10);
       latency.value = Date.now() - data.ts
       break;
   }
