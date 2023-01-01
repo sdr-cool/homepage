@@ -30,8 +30,8 @@ function size(sz) {
 <template>
 <div class="panel">
   <div class="left">
-    <button>‹</button>
-    <button>«</button>
+    <button :disabled="!device" @click="frequency -= 100000">‹</button>
+    <button :disabled="!device">«</button>
   </div>
   <div class="cennter_console">
     <div v-if="!error && device" class="radio_info">
@@ -46,8 +46,8 @@ function size(sz) {
     </div>
   </div>
   <div class="right">
-    <button>›</button>
-    <button>»</button>
+    <button :disabled="!device" @click="frequency += 100000">›</button>
+    <button :disabled="!device">»</button>
   </div>
   <div class="bottom">
     <div>
@@ -85,10 +85,10 @@ function size(sz) {
   .left, .right {
     button {
       display: block;
-      width: 20px;
+      width: 35px;
       height: 20px;
       line-height: 0;
-      padding: 18px 20px;
+      padding: 18px 0;
     }
 
     :first-child {

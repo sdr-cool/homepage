@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 import RtlSdr from 'rtlsdrjs'
 import Decoder from './decode-worker'
@@ -31,6 +31,8 @@ async function disconnect() {
   toClose.close()
 }
 
+let frequencyChanging = false
+
 async function receive() {
   decoder = decoder || new Decoder()
   player = player || new Player()
@@ -39,10 +41,25 @@ async function receive() {
   await sdr.setCenterFrequency(frequency.value)
   await sdr.resetBuffer()
   while (sdr) {
+    if (frequencyChanging) {
+      await new Promise(r => setTimeout(r, 10))
+      continue
+    }
+
     const samples = await sdr.readSamples(SAMPLES_PER_BUF)
-    postMessage({ type: 'samples', samples, ts: Date.now() })
+    if (samples.byteLength > 0) postMessage({ type: 'samples', samples, ts: Date.now() })
   }
 }
+
+watch(frequency, async newFreq => {
+  try {
+    frequencyChanging = true
+    await sdr.setCenterFrequency(newFreq)
+    await sdr.resetBuffer()
+  } finally {
+    frequencyChanging = false
+  }
+})
 
 window.addEventListener('message', ({ data }) => {
   switch (data.type) {
