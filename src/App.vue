@@ -76,7 +76,7 @@ function size(sz) {
 <style scoped lang="scss">
 .panel {
   border-radius: 5px;
-  box-shadow: 1px 1px 2px 2px #ddd;
+  // box-shadow: 1px 1px 2px 2px #ddd;
   padding: 10px 5px;
   display: flex;
   background-color: #dddddd;
