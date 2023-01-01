@@ -44,13 +44,17 @@ export async function receive() {
   await sdr.setSampleRate(SAMPLE_RATE)
   await sdr.setCenterFrequency(frequency.value)
   await sdr.resetBuffer()
+  let currentFreq = frequency.value
   while (sdr) {
     if (frequencyChanging) {
       await new Promise(r => setTimeout(r, 1))
       continue
     }
 
-    const currentFreq = frequency.value
+    if (currentFreq !== frequency.value) {
+      currentFreq = frequency.value
+      await sdr.resetBuffer()
+    }
     const samples = await sdr.readSamples(SAMPLES_PER_BUF)
     if (samples.byteLength > 0) {
       postMessage({ type: 'samples', samples, ts: Date.now(), frequency: currentFreq })
