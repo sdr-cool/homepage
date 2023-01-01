@@ -16,6 +16,7 @@ let player = null
 
 export const frequency = ref(88.7 * 1e6)
 export const tuningFreq = ref(0)
+export const latency = ref(0)
 export const signalLevel = ref(0)
 export const device = ref('')
 export const totalReceived = ref(0)
@@ -107,6 +108,7 @@ window.addEventListener('message', ({ data }) => {
       left = new Float32Array(left);
       right = new Float32Array(right);
       player.play(left, right, 40, 20);
+      latency.value = Date.now() - data.ts
       break;
   }
 })

@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { connect as connectSdr, disconnect, receive, device, frequency, tuningFreq, signalLevel, totalReceived, processedData } from  './utils/sdr'
+import { connect as connectSdr, disconnect, receive, device, frequency, latency, tuningFreq, signalLevel, totalReceived, processedData } from  './utils/sdr'
 
 const error = ref(null)
 const debug = ref(false)
@@ -63,7 +63,7 @@ function size(sz) {
     </div>
   </div>
   <div class="debug" v-if="debug">
-    <div>Data: {{ size(totalReceived) }}</div>
+    <div>Data: {{ size(totalReceived) }}, latency: {{ latency }}ms</div>
     <p v-if="error">
       <pre v-if="!error.stack">{{ error }}</pre>
       <pre v-if="error.stack">{{ error.stack }}</pre>
