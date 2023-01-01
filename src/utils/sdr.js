@@ -13,6 +13,7 @@ let decoder = null
 let player = null
 
 export const frequency = ref(88.7 * 1e6)
+export const signalLevel = ref(0)
 export const device = ref('')
 export const totalReceived = ref(0)
 export const processedData = ref(0)
@@ -48,7 +49,8 @@ window.addEventListener('message', ({ data }) => {
     case 'samples':
       const samples = data.samples
       totalReceived.value += samples.byteLength
-      let [left, right] = decoder.process(samples, true, 0)
+      let [left, right, sl] = decoder.process(samples, true, 0)
+      signalLevel.value = sl
       processedData.value += left.byteLength + right.byteLength
       left = new Float32Array(left);
       right = new Float32Array(right);

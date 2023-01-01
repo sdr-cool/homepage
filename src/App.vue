@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { connect as connectSdr, disconnect, receive, device, frequency, totalReceived, processedData } from  './utils/sdr'
+import { connect as connectSdr, disconnect, receive, device, frequency, signalLevel, totalReceived, processedData } from  './utils/sdr'
 
 const error = ref(null)
 
@@ -18,7 +18,15 @@ async function connect() {
 
 <template>
 <div>
-{{ device }} Total received:{{ (totalReceived / 1024 / 1024).toFixed(2) }}MB, Processed:{{ (processedData / 1024 / 1024).toFixed(2) }}MB
+  <div class="cennter_console">
+    <div v-if="!error" class="radio_info">
+      <div class="freq">{{ (frequency / 1e6).toFixed(1) }}</div>
+      <div class="mode">FM</div>
+      <div class="signal_level">
+        <div class="bar" :style="{ height: signalLevel * 100 + '%'  }"></div>
+      </div>
+    </div>
+  </div>
 </div>
 <button @click="connect" v-if="!device">连接</button>
 <button @click="disconnect" v-if="device">断开</button>
@@ -29,5 +37,46 @@ async function connect() {
 </p>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+.cennter_console {
+  color: #bdfcdf;
+  background-color: #364334;
+  min-width: 220px;
+  height: 80px;
+
+  .radio_info {
+    position: relative;
+    .freq {
+      line-height: 80px;
+      font-size: 60px;
+      font-weight: bold;
+    }
+
+    .mode {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    .signal_level {
+      position: absolute;
+      right: 16px;
+      bottom: 35px;
+      height: 30px;
+      width: 10px;
+      background-color: #3d7457;
+
+      .bar {
+        width: 100%;
+        background-color: #bdfcdf;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+      }
+    }
+  }
+
+}
 </style>
