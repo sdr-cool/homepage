@@ -14,6 +14,7 @@ let sdr = null
 let decoder = null
 let player = null
 
+export const mode = ref('FM')
 export const frequency = ref(88.7 * 1e6)
 export const tuningFreq = ref(0)
 export const latency = ref(0)
@@ -39,6 +40,8 @@ let frequencyChanging = false
 
 export async function receive() {
   decoder = decoder || new Decoder()
+  decoder.setMode(mode.value)
+
   player = player || new Player()
   await sdr.open({ ppm: 0.5 })
   await sdr.setSampleRate(SAMPLE_RATE)
@@ -77,6 +80,10 @@ watch(frequency, async newFreq => {
   } finally {
     frequencyChanging = false
   }
+})
+
+watch(mode, newMode => {
+  decoder.setMode(newMode)
 })
 
 window.addEventListener('message', ({ data }) => {

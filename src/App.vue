@@ -1,9 +1,11 @@
 <script setup>
 import { ref } from 'vue'
-import { connect as connectSdr, disconnect, receive, device, frequency, latency, tuningFreq, signalLevel, totalReceived, processedData } from  './utils/sdr'
+import { connect as connectSdr, disconnect, receive, device, mode, frequency, latency, tuningFreq, signalLevel, totalReceived, processedData } from  './utils/sdr'
+import ModeDialog from './components/ModeDialog.vue';
 
 const error = ref(null)
 const debug = ref(false)
+const showModeDialog = ref(false)
 
 async function connect() {
   error.value = null
@@ -28,6 +30,8 @@ function size(sz) {
 </script>
 
 <template>
+<mode-dialog v-model="showModeDialog" />
+
 <div class="panel">
   <div class="left">
     <button :disabled="!device" @click="frequency -= 100000">‹</button>
@@ -36,7 +40,7 @@ function size(sz) {
   <div class="cennter_console">
     <div v-if="!error && device" class="radio_info">
       <div class="freq">{{ ((frequency + tuningFreq) / 1e6).toFixed(1) }}</div>
-      <div class="mode">FM</div>
+      <div class="mode" @click="showModeDialog = true">{{ mode }}</div>
       <div class="signal_level">
         <div class="bar" :style="{ height: signalLevel * 100 + '%'  }"></div>
       </div>

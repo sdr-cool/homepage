@@ -18,9 +18,9 @@
  */
 
 import { iqSamplesFromUint8, shiftFrequency } from './dsp'
-// importScripts('demodulator-am.js');
-// importScripts('demodulator-ssb.js');
-// importScripts('demodulator-nbfm.js');
+import Demodulator_AM from './demodulator-am.js';
+import Demodulator_SSB from './demodulator-ssb.js';
+import Demodulator_NBFM from './demodulator-nbfm.js';
 import Demodulator_WBFM from './demodulator-wbfm.js';
 
 var IN_RATE = 1024000;
@@ -61,18 +61,18 @@ function Decoder() {
    * @param {Object} mode The new mode.
    */
   function setMode(mode) {
-    switch (mode.modulation) {
+    switch (mode) {
       case 'AM':
-        demodulator = new Demodulator_AM(IN_RATE, OUT_RATE, mode.bandwidth);
+        demodulator = new Demodulator_AM(IN_RATE, OUT_RATE, 10000);
         break;
       case 'USB':
-        demodulator = new Demodulator_SSB(IN_RATE, OUT_RATE, mode.bandwidth, true);
+        demodulator = new Demodulator_SSB(IN_RATE, OUT_RATE, 2900, true);
         break;
       case 'LSB':
-        demodulator = new Demodulator_SSB(IN_RATE, OUT_RATE, mode.bandwidth, false);
+        demodulator = new Demodulator_SSB(IN_RATE, OUT_RATE, 2900, false);
         break;
-      case 'NBFM':
-        demodulator = new Demodulator_NBFM(IN_RATE, OUT_RATE, mode.maxF);
+      case 'NFM':
+        demodulator = new Demodulator_NBFM(IN_RATE, OUT_RATE, 10000);
         break;
       default:
         demodulator = new Demodulator_WBFM(IN_RATE, OUT_RATE);
