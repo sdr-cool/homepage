@@ -4,6 +4,8 @@ import RtlSdr from 'rtlsdrjs'
 import Decoder from './decode-worker'
 import Player from './audio'
 
+import { mode, frequency, tuningFreq, latency, signalLevel, device, totalReceived } from './sdr-vals'
+
 const SAMPLE_RATE = 1024 * 1e3 // Must be a multiple of 512 * BUFS_PER_SEC
 const BUFS_PER_SEC = 32
 const SAMPLES_PER_BUF = Math.floor(SAMPLE_RATE / BUFS_PER_SEC)
@@ -13,14 +15,6 @@ const MAX_FREQ = 8e8
 let sdr = null
 let decoder = null
 let player = null
-
-export const mode = ref('FM')
-export const frequency = ref(88.7 * 1e6)
-export const tuningFreq = ref(0)
-export const latency = ref(0)
-export const signalLevel = ref(0)
-export const device = ref('')
-export const totalReceived = ref(0)
 
 export async function connect() {
   sdr = await RtlSdr.requestDevice()

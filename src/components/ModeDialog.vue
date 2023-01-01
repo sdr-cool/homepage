@@ -1,6 +1,6 @@
 <script setup>
 import PopupDialog from './PopupDialog.vue'
-import { mode } from '../utils/sdr'
+import { mode } from '../utils/sdr-vals'
 
 const models = ['FM', 'NFM', 'AM', 'LSB', 'USB']
 

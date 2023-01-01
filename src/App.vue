@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
-import { connect as connectSdr, disconnect, receive, device, mode, frequency, latency, tuningFreq, signalLevel, totalReceived } from  './utils/sdr'
+import { mode, frequency, tuningFreq, latency, signalLevel, device, totalReceived } from './utils/sdr-vals'
+import { connect as connectSdr, disconnect, receive } from  './utils/http-sdr'
 import ModeDialog from './components/ModeDialog.vue';
 
 const error = ref(null)

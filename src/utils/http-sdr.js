@@ -1,16 +1,9 @@
-import { ref, watch } from 'vue'
+import { watch } from 'vue'
 import Player from './audio'
+import { mode, frequency, tuningFreq, latency, signalLevel, device, totalReceived } from './sdr-vals'
 
 let ws = null
 let player = null
-
-export const mode = ref('FM')
-export const frequency = ref(88.7 * 1e6)
-export const tuningFreq = ref(0)
-export const latency = ref(0)
-export const signalLevel = ref(0)
-export const device = ref('')
-export const totalReceived = ref(0)
 
 const url = 'ws://localhost:3000/data'
 
@@ -22,7 +15,7 @@ export async function connect() {
   ws.addEventListener('message', ({ data }) => {
     if (data instanceof ArrayBuffer) {
       totalReceived.value += data.byteLength
-      const sz = (data.byteLength - 16) / 2
+      const sz = (data.byteLength - 16 - 4) / 2
       const left = new Float32Array(data.slice(0, sz))
       const right = new Float32Array(data.slice(sz, sz * 2))
       player.play(left, right, signalLevel.value, 0.15)
@@ -30,6 +23,7 @@ export async function connect() {
       const dv = new DataView(data)
       signalLevel.value = dv.getFloat64(sz * 2)
       latency.value = Date.now() - dv.getFloat64(sz * 2 + 8)
+      const freqR = dv.getUint32(sz * 2 + 16)
     } else {
       const info = JSON.parse(data)
       mode.value = info.mode
@@ -47,10 +41,14 @@ export async function disconnect() {
 
 export async function receive() { }
 
-watch(frequency, async newFreq => {
-  // await sdr.setCenterFrequency(newFreq)
+watch(frequency, () => {
+  ws.send(JSON.stringify({ type: 'frequency', frequency: frequency.value, tuningFreq: tuningFreq.value  }))
+})
+
+watch(tuningFreq, () => {
+  ws.send(JSON.stringify({ type: 'frequency', frequency: frequency.value, tuningFreq: tuningFreq.value  }))
 })
 
 watch(mode, newMode => {
-  // decoder.setMode(newMode)
+  ws.send(JSON.stringify({ type: 'mode', mode: newMode  }))
 })
