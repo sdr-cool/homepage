@@ -25,7 +25,7 @@ export async function connect() {
 
       const dv = new DataView(data)
       signalLevel.value = dv.getFloat64(sz * 2)
-      latency.value = Date.now() - dv.getFloat64(sz * 2 + 8) - tsOffset
+      latency.value = Date.now() - dv.getFloat64(sz * 2 + 8) + tsOffset
       const freqR = dv.getUint32(sz * 2 + 16)
 
       const sl = signalLevel.value
@@ -51,7 +51,7 @@ export async function connect() {
       }
     } else {
       const info = JSON.parse(data)
-      tsOffset = Date.now() - info.ts
+      tsOffset = info.ts - connTs
       mode.value = info.mode
       frequency.value = info.frequency
       tuningFreq.value = info.tuningFreq

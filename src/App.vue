@@ -72,7 +72,7 @@ function size(sz) {
   </div>
   <bookmarks v-if="device && showBookmarks" />
   <div class="debug" v-if="debug">
-    <div>Data: {{ size(totalReceived) }}, latency: {{ latency }}ms</div>
+    <div>Data: {{ size(totalReceived) }}, latency: <span class="latency">{{ latency }}</span>ms</div>
     <p v-if="error">
       <pre v-if="!error.message">{{ error }}</pre>
       <pre v-if="error.message">{{ error.message }}</pre>
@@ -140,6 +140,11 @@ function size(sz) {
     background-color: #364334;
     color: #bdfcdf;
     padding: 10px 5px;
+
+    .latency {
+      min-width: 20px;
+      display: inline-block;
+    }
 
     pre {
       text-align: left;
