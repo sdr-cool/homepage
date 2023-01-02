@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "axios": "^1.2.2",
     "lodash": "^4.17.21",
     "rtlsdrjs": "^0.0.0",
     "sass": "^1.57.1",

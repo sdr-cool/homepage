@@ -4,11 +4,13 @@ import { mode, frequency, tuningFreq, latency, signalLevel, device, totalReceive
 import { connect as connectSdr, disconnect, receive } from  './utils/sdr'
 import ModeSelect from './components/ModeSelect.vue'
 import FrequencyInput from './components/FrequencyInput.vue'
+import Bookmarks from './components/Bookmarks.vue'
 
 const error = ref(null)
 const debug = ref(true)
 const showModeSelect = ref(false)
 const showFreqInput = ref(false)
+const showBookmarks = ref(false)
 
 async function connect() {
   error.value = null
@@ -64,11 +66,11 @@ function size(sz) {
     <div class="center">
       {{ device }}
     </div>
-    <!-- <div>
-      <button v-if="!debug" @click="debug = true">▼</button>
-      <button v-if="debug" @click="debug = false">▶</button>
-    </div> -->
+    <div>
+      <button style="font-size: 14px" v-if="device" @click="showBookmarks = !showBookmarks" :class="{ active: showBookmarks }">☆</button>
+    </div>
   </div>
+  <bookmarks v-if="device && showBookmarks" />
   <div class="debug" v-if="debug">
     <div>Data: {{ size(totalReceived) }}, latency: {{ latency }}ms</div>
     <p v-if="error">

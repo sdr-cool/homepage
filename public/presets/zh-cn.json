@@ -1,0 +1,35 @@
+[
+  {
+    "type": "dir",
+    "name": "北京",
+    "expand": true,
+    "items": [{
+        "type": "dir",
+        "name": "FM",
+        "expand": true,
+        "items": [
+          { "name": "Easy FM", "mode": "FM", "frequency": "88.7" },
+          { "name": "北京新闻广播", "mode": "FM", "frequency": "94.5" },
+          { "name": "北京音乐广播", "mode": "FM", "frequency": "97.4" }
+        ]
+      },{
+        "type": "dir",
+        "name": "枫花园汽车影院",
+        "items": [
+          { "name": "A", "mode": "FM", "frequency": "89" },
+          { "name": "B", "mode": "FM", "frequency": "96.9" },
+          { "name": "C", "mode": "FM", "frequency": "94.1" },
+          { "name": "D", "mode": "FM", "frequency": "92.5" }
+        ]
+      },{
+        "type": "dir",
+        "name": "首都机场",
+        "items": [
+          { "name": "塔台1", "mode": "AM", "frequency": "118.05" },
+          { "name": "塔台2", "mode": "AM", "frequency": "118.5" },
+          { "name": "塔台3", "mode": "AM", "frequency": "124.3" }
+        ]
+      }
+    ]
+  }
+]
