@@ -57,7 +57,7 @@ export async function connect() {
       }
     } else {
       const info = JSON.parse(data)
-      tsOffset = Math.round(info.ts - (connTs + Date.now()) / 2)
+      tsOffset = Math.round(info.ts - (connTs + Date.now()) / 2 + (Date.now() - connTs) / 2)
       mode.value = info.mode
       frequency.value = info.frequency
       tuningFreq.value = info.tuningFreq
