@@ -39,7 +39,7 @@ function size(sz) {
   <div class="cennter_console">
     <div v-if="!error && device" class="radio_info">
       <div class="freq">{{ ((frequency + tuningFreq) / 1e6).toFixed(1) }}</div>
-      <div class="mode" @click="showModeSelect = true">{{ mode }}</div>
+      <div class="mode" @click="showModeSelect = !showModeSelect">{{ mode }}</div>
       <div class="signal_level">
         <div class="bar" :style="{ height: signalLevel * 100 + '%'  }"></div>
       </div>
