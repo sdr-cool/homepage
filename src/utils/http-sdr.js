@@ -13,17 +13,19 @@ export async function connect() {
   ws = new WebSocket(url)
   ws.binaryType = "arraybuffer"
   device.value = url
+  const connTs = Date.now()
+  let tsOffset = 0
   ws.addEventListener('message', ({ data }) => {
     if (data instanceof ArrayBuffer) {
       totalReceived.value += data.byteLength
       const sz = (data.byteLength - 16 - 4) / 2
       const left = new Float32Array(data.slice(0, sz))
       const right = new Float32Array(data.slice(sz, sz * 2))
-      player.play(left, right, signalLevel.value, 0.15)
+      if (Date.now() - connTs > 1000) player.play(left, right, signalLevel.value, 0.15)
 
       const dv = new DataView(data)
       signalLevel.value = dv.getFloat64(sz * 2)
-      latency.value = Date.now() - dv.getFloat64(sz * 2 + 8)
+      latency.value = Date.now() - dv.getFloat64(sz * 2 + 8) - tsOffset
       const freqR = dv.getUint32(sz * 2 + 16)
 
       const sl = signalLevel.value
@@ -49,6 +51,7 @@ export async function connect() {
       }
     } else {
       const info = JSON.parse(data)
+      tsOffset = Date.now() - info.ts
       mode.value = info.mode
       frequency.value = info.frequency
       tuningFreq.value = info.tuningFreq
