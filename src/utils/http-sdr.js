@@ -13,8 +13,14 @@ export async function connect() {
   ws = new WebSocket(url)
   ws.binaryType = "arraybuffer"
   device.value = url
-  const connTs = Date.now()
+  let connTs = 0
   let tsOffset = 0
+
+  ws.addEventListener('open', () => {
+    connTs = Date.now()
+    ws.send(JSON.stringify({ type: 'init' }))
+  })
+
   ws.addEventListener('message', ({ data }) => {
     if (data instanceof ArrayBuffer) {
       totalReceived.value += data.byteLength
@@ -51,7 +57,7 @@ export async function connect() {
       }
     } else {
       const info = JSON.parse(data)
-      tsOffset = info.ts - connTs
+      tsOffset = Math.round(info.ts - (connTs + Date.now()) / 2)
       mode.value = info.mode
       frequency.value = info.frequency
       tuningFreq.value = info.tuningFreq
