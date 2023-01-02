@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { ref, watch } from 'vue'
 
 import RtlSdr from 'rtlsdrjs'
@@ -16,9 +17,19 @@ let sdr = null
 let decoder = null
 let player = null
 
+const save = _.debounce(() => {
+  localStorage.setItem('sdr_state', JSON.stringify({ mode: mode.value, frequency: frequency.value }))
+}, 1000)
+
 export async function connect() {
   sdr = await RtlSdr.requestDevice()
   device.value = sdr._usbDevice._device.productName
+
+  try {
+    const saved = JSON.parse(localStorage.getItem('sdr_state'))
+    mode.value = saved.mode
+    frequency.value = saved.frequency
+  } catch { }
 }
 
 export async function disconnect() {
@@ -60,10 +71,12 @@ watch(frequency, async newFreq => {
     frequency.value = MAX_FREQ
     tuningFreq.value = 0
   }
+  save()
 })
 
 watch(mode, newMode => {
   decoder.setMode(newMode)
+  save()
 })
 
 window.addEventListener('message', ({ data }) => {
