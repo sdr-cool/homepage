@@ -25,8 +25,8 @@ export async function connect() {
     if (data instanceof ArrayBuffer) {
       totalReceived.value += data.byteLength
       const sz = (data.byteLength - 16 - 4) / 2
-      const left = new Float32Array(data.slice(0, sz))
-      const right = new Float32Array(data.slice(sz, sz * 2))
+      const left = new Float32Array(data, 0, sz / 4)
+      const right = new Float32Array(data, sz, sz / 4)
       if (Date.now() - connTs > 1000) player.play(left, right, signalLevel.value, 0.15)
 
       const dv = new DataView(data)
