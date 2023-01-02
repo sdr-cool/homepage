@@ -2,11 +2,13 @@
 import { ref } from 'vue'
 import { mode, frequency, tuningFreq, latency, signalLevel, device, totalReceived } from './utils/sdr-vals'
 import { connect as connectSdr, disconnect, receive } from  './utils/sdr'
-import ModeSelect from './components/ModeSelect.vue';
+import ModeSelect from './components/ModeSelect.vue'
+import FrequencyInput from './components/FrequencyInput.vue'
 
 const error = ref(null)
 const debug = ref(true)
 const showModeSelect = ref(false)
+const showFreqInput = ref(false)
 
 async function connect() {
   error.value = null
@@ -38,7 +40,7 @@ function size(sz) {
   </div>
   <div class="cennter_console">
     <div v-if="!error && device" class="radio_info">
-      <div class="freq">{{ ((frequency + tuningFreq) / 1e6).toFixed(1) }}</div>
+      <div class="freq" @click="showFreqInput = !showFreqInput">{{ ((frequency + tuningFreq) / 1e6).toFixed(2) }}</div>
       <div class="mode" @click="showModeSelect = !showModeSelect">{{ mode }}</div>
       <div class="signal_level">
         <div class="bar" :style="{ height: signalLevel * 100 + '%'  }"></div>
@@ -53,6 +55,7 @@ function size(sz) {
     <button :disabled="!device" @click="tuningFreq += 100000">»</button>
   </div>
   <mode-select v-model="showModeSelect" />
+  <frequency-input v-model="showFreqInput" />
   <div class="bottom">
     <div>
       <button @click="connect" v-if="!device">⏼</button>
