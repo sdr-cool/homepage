@@ -74,8 +74,8 @@ function size(sz) {
   <div class="debug" v-if="debug">
     <div>Data: {{ size(totalReceived) }}, latency: {{ latency }}ms</div>
     <p v-if="error">
-      <pre v-if="!error.stack">{{ error }}</pre>
-      <pre v-if="error.stack">{{ error.stack }}</pre>
+      <pre v-if="!error.message">{{ error }}</pre>
+      <pre v-if="error.message">{{ error.message }}</pre>
     </p>
   </div>
 </div>
