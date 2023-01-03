@@ -63,13 +63,13 @@ function Decoder() {
   function setMode(mode) {
     switch (mode) {
       case 'AM':
-        demodulator = new Demodulator_AM(IN_RATE, OUT_RATE, 10000);
+        demodulator = new Demodulator_AM(IN_RATE, OUT_RATE, 6000);
         break;
       case 'USB':
-        demodulator = new Demodulator_SSB(IN_RATE, OUT_RATE, 2900, true);
+        demodulator = new Demodulator_SSB(IN_RATE, OUT_RATE, 2700, true);
         break;
       case 'LSB':
-        demodulator = new Demodulator_SSB(IN_RATE, OUT_RATE, 2900, false);
+        demodulator = new Demodulator_SSB(IN_RATE, OUT_RATE, 2700, false);
         break;
       case 'NFM':
         demodulator = new Demodulator_NBFM(IN_RATE, OUT_RATE, 10000);
