@@ -5,7 +5,7 @@ import RtlSdr from 'rtlsdrjs'
 import Decoder from './decode-worker'
 import Player from './audio'
 
-import { mode, frequency, tuningFreq, latency, signalLevel, device, totalReceived } from './sdr-vals'
+import { mode, frequency, tuningFreq, latency, setSignalLevel, device, totalReceived } from './sdr-vals'
 
 const SAMPLE_RATE = 1024 * 1e3 // Must be a multiple of 512 * BUFS_PER_SEC
 const BUFS_PER_SEC = 100
@@ -107,10 +107,10 @@ window.addEventListener('message', ({ data }) => {
         }
       }
 
-      signalLevel.value = sl
+      setSignalLevel(sl)
       left = new Float32Array(left);
       right = new Float32Array(right);
-      player.play(left, right, signalLevel.value, 0.15);
+      player.play(left, right, sl, 0.15);
       latency.value = Date.now() - data.ts
       break;
   }
