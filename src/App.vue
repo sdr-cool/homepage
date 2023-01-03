@@ -1,10 +1,12 @@
 <script setup>
 import { ref } from 'vue'
 import { mode, frequency, tuningFreq, latency, signalLevel, device, totalReceived } from './utils/sdr-vals'
-import { connect as connectSdr, disconnect, receive } from  './utils/sdr'
 import ModeSelect from './components/ModeSelect.vue'
 import FrequencyInput from './components/FrequencyInput.vue'
 import Bookmarks from './components/Bookmarks.vue'
+
+const USE_SDR_PROXY = import.meta.env.VITE_SDR_PROXY
+let connect, disconnect, receive
 
 const error = ref(null)
 const debug = ref(false)
@@ -12,10 +14,15 @@ const showModeSelect = ref(false)
 const showFreqInput = ref(false)
 const showBookmarks = ref(false)
 
-async function connect() {
+async function connectSdr() {
+  const module = await import(USE_SDR_PROXY ? './utils/http-sdr' : './utils/sdr'/* @vite-ignore */)
+  connect = module.connect
+  disconnect = module.disconnect
+  receive = module.receive
+
   error.value = null
   try {
-    await connectSdr()
+    await connect()
     receive().catch(e => error.value = e)
   } catch (e) {
     error.value = e
@@ -60,7 +67,7 @@ function size(sz) {
   <frequency-input v-model="showFreqInput" />
   <div class="bottom">
     <div>
-      <button @click="connect" v-if="!device">⏼</button>
+      <button @click="connectSdr" v-if="!device">⏼</button>
       <button @click="disconnect" v-if="device" class="active">⏼</button>
     </div>
     <div class="center">

@@ -5,8 +5,7 @@ import { mode, frequency, tuningFreq, latency, device, totalReceived, setSignalL
 let ws = null
 let player = null
 
-// const url = 'ws://192.168.1.18:3000/data'
-const url = `ws://${location.host}/data`
+const url = import.meta.env.PROD ? `ws://${location.host}/data` : `ws://${location.hostname}:3000/data`
 
 export async function connect() {
   player = player || new Player()

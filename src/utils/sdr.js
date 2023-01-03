@@ -75,8 +75,10 @@ watch(frequency, async newFreq => {
 })
 
 watch(mode, newMode => {
-  decoder.setMode(newMode)
-  save()
+  if (decoder) {
+    decoder.setMode(newMode)
+    save()
+  }
 })
 
 window.addEventListener('message', ({ data }) => {
