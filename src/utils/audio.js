@@ -111,5 +111,6 @@ function Player() {
   };
 }
 
-export default Player;
-
+let instance = null
+export function init() { if (!instance) instance = new Player(); }
+export function getInstance() { return instance; }

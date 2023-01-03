@@ -1,5 +1,5 @@
 import { watch } from 'vue'
-import Player from './audio'
+import { getInstance } from './audio'
 import { mode, frequency, tuningFreq, latency, device, totalReceived, setSignalLevel } from './sdr-vals'
 
 let ws = null
@@ -9,8 +9,8 @@ let error = null
 const url = import.meta.env.PROD ? `ws://${location.host}/data` : `ws://${location.hostname}:3000/data`
 
 export async function connect() {
+  player = getInstance()
   error = null
-  player = player || new Player()
   ws = new WebSocket(url)
   ws.binaryType = "arraybuffer"
   device.value = url

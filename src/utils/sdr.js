@@ -3,7 +3,7 @@ import { ref, watch } from 'vue'
 
 import RtlSdr from 'rtlsdrjs'
 import Decoder from './decode-worker'
-import Player from './audio'
+import { getInstance } from './audio'
 
 import { mode, frequency, tuningFreq, latency, setSignalLevel, device, totalReceived } from './sdr-vals'
 
@@ -46,7 +46,7 @@ export async function receive() {
   decoder = decoder || new Decoder()
   decoder.setMode(mode.value)
 
-  player = player || new Player()
+  player = getInstance()
   await sdr.open({ ppm: 0.5 })
   await sdr.setSampleRate(SAMPLE_RATE)
   await sdr.setCenterFrequency(frequency.value)
