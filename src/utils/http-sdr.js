@@ -1,11 +1,11 @@
 import { watch } from 'vue'
 import Player from './audio'
-import { mode, frequency, tuningFreq, latency, signalLevel, device, totalReceived } from './sdr-vals'
+import { mode, frequency, tuningFreq, latency, device, totalReceived, setSignalLevel } from './sdr-vals'
 
 let ws = null
 let player = null
 
-// const url = 'ws://localhost:3000/data'
+// const url = 'ws://192.168.1.18:3000/data'
 const url = `ws://${location.host}/data`
 
 export async function connect() {
@@ -25,16 +25,18 @@ export async function connect() {
     if (data instanceof ArrayBuffer) {
       totalReceived.value += data.byteLength
       const sz = (data.byteLength - 16 - 4) / 2
-      const left = new Float32Array(data, 0, sz / 4)
-      const right = new Float32Array(data, sz, sz / 4)
-      if (Date.now() - connTs > 1000) player.play(left, right, signalLevel.value, 0.15)
 
       const dv = new DataView(data)
-      signalLevel.value = dv.getFloat64(sz * 2)
+      const sl = dv.getFloat64(sz * 2)
+      setSignalLevel(sl)
+
+      const left = new Float32Array(data, 0, sz / 4)
+      const right = new Float32Array(data, sz, sz / 4)
+      if (Date.now() - connTs > 1000) player.play(left, right, sl, 0.15)
+
       latency.value = Date.now() - dv.getFloat64(sz * 2 + 8) + tsOffset
       const freqR = dv.getUint32(sz * 2 + 16)
 
-      const sl = signalLevel.value
       if (frequency.value + tuningFreq.value === freqR) {
         if (sl > 0.5 && tuningFreq.value !== 0) {
           frequency.value = frequency.value + tuningFreq.value

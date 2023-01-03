@@ -7,7 +7,7 @@ import FrequencyInput from './components/FrequencyInput.vue'
 import Bookmarks from './components/Bookmarks.vue'
 
 const error = ref(null)
-const debug = ref(true)
+const debug = ref(false)
 const showModeSelect = ref(false)
 const showFreqInput = ref(false)
 const showBookmarks = ref(false)
@@ -71,7 +71,7 @@ function size(sz) {
     </div>
   </div>
   <bookmarks v-if="device && showBookmarks" />
-  <div class="debug" v-if="debug">
+  <div class="debug" v-if="debug || error">
     <div>Data: {{ size(totalReceived) }}, latency: <span class="latency">{{ latency }}</span>ms</div>
     <p v-if="error">
       <pre v-if="!error.message">{{ error }}</pre>
