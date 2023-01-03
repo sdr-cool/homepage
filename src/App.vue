@@ -5,7 +5,6 @@ import ModeSelect from './components/ModeSelect.vue'
 import FrequencyInput from './components/FrequencyInput.vue'
 import Bookmarks from './components/Bookmarks.vue'
 
-const USE_SDR_PROXY = import.meta.env.VITE_SDR_PROXY
 let connect, disconnect, receive
 
 const error = ref(null)
@@ -15,7 +14,7 @@ const showFreqInput = ref(false)
 const showBookmarks = ref(false)
 
 async function connectSdr() {
-  const module = await import(USE_SDR_PROXY ? './utils/http-sdr' : './utils/sdr'/* @vite-ignore */)
+  const module = import.meta.env.VITE_SDR_PROXY ? await import('./utils/http-sdr.js') : await import('./utils/sdr.js')
   connect = module.connect
   disconnect = module.disconnect
   receive = module.receive

@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev-sdr-proxy": "VITE_SDR_PROXY=true vite --host",
     "build": "vite build",
+    "build-sdr-proxy": "VITE_SDR_PROXY=true vite build",
     "preview": "vite preview"
   },
   "dependencies": {
