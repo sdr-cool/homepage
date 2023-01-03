@@ -72,9 +72,12 @@ export async function connect() {
 }
 
 export async function disconnect() {
-  ws.close()
+  const toClose = ws
   ws = null
   device.value = ''
+
+  await new Promise(r => setTimeout(r, 100))
+  if (toClose) toClose.close()
 }
 
 export async function receive() {

@@ -30,6 +30,7 @@ function Player() {
   var ac = new (window.AudioContext || window.webkitAudioContext)();
   var gainNode = ac.createGain ? ac.createGain() : ac.createGainNode();
   gainNode.connect(ac.destination);
+  gainNode.gain.value = 1;
 
   /**
    * Queues the given samples for playing at the appropriate time.
