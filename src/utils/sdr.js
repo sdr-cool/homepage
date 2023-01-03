@@ -110,7 +110,7 @@ window.addEventListener('message', ({ data }) => {
       setSignalLevel(sl)
       left = new Float32Array(left);
       right = new Float32Array(right);
-      player.play(left, right, sl, 0.15);
+      player.play(left, right, sl, mode.value === 'FM' ? 0.15 : sl / 10);
       latency.value = Date.now() - data.ts
       break;
   }
