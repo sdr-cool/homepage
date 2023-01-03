@@ -77,7 +77,7 @@ function size(sz) {
       <button style="font-size: 14px" v-if="device" @click="showBookmarks = !showBookmarks" :class="{ active: showBookmarks }">☆</button>
     </div>
   </div>
-  <bookmarks v-if="device && showBookmarks" />
+  <bookmarks v-show="device && showBookmarks" />
   <div class="debug" v-if="debug || error">
     <div>Data: {{ size(totalReceived) }}, latency: <span class="latency">{{ latency }}</span>ms</div>
     <p v-if="error">
