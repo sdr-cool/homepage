@@ -185,6 +185,7 @@ function size(sz) {
         line-height: 80px;
         font-size: 60px;
         font-weight: bold;
+        cursor: pointer;
       }
 
       .mode {
@@ -193,6 +194,7 @@ function size(sz) {
         bottom: 10px;
         font-size: 15px;
         font-weight: bold;
+        cursor: pointer;
       }
 
       .signal_level {
