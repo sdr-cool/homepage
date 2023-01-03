@@ -4,10 +4,12 @@ import { mode, frequency, tuningFreq, latency, device, totalReceived, setSignalL
 
 let ws = null
 let player = null
+let error = null
 
 const url = import.meta.env.PROD ? `ws://${location.host}/data` : `ws://${location.hostname}:3000/data`
 
 export async function connect() {
+  error = null
   player = player || new Player()
   ws = new WebSocket(url)
   ws.binaryType = "arraybuffer"
@@ -19,6 +21,9 @@ export async function connect() {
     connTs = Date.now()
     ws.send(JSON.stringify({ type: 'init' }))
   })
+
+  ws.addEventListener('error', () => error = `Connect to ${url} failed.`)
+  ws.addEventListener('close', () => error = `Stream ${url} closed.`)
 
   ws.addEventListener('message', ({ data }) => {
     if (data instanceof ArrayBuffer) {
@@ -72,7 +77,12 @@ export async function disconnect() {
   device.value = ''
 }
 
-export async function receive() { }
+export async function receive() {
+  while (ws) {
+    await new Promise(r => setTimeout(r, 100))
+    if (error) throw error
+  }
+}
 
 watch(frequency, () => {
   ws.send(JSON.stringify({ type: 'frequency', frequency: frequency.value, tuningFreq: tuningFreq.value  }))

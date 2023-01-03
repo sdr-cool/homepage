@@ -22,10 +22,11 @@ async function connectSdr() {
   error.value = null
   try {
     await connect()
-    receive().catch(e => error.value = e)
+    await receive()
   } catch (e) {
-    error.value = e
-    console.log(e.message)
+    error.value = e.message || e.toString()
+    console.error(e)
+    disconnect()
   }
 }
 
@@ -80,8 +81,7 @@ function size(sz) {
   <div class="debug" v-if="debug || error">
     <div>Data: {{ size(totalReceived) }}, latency: <span class="latency">{{ latency }}</span>ms</div>
     <p v-if="error">
-      <pre v-if="!error.message">{{ error }}</pre>
-      <pre v-if="error.message">{{ error.message }}</pre>
+      <pre>{{ error }}</pre>
     </p>
   </div>
 </div>
