@@ -36,8 +36,10 @@ export async function disconnect() {
   const toClose = sdr
   sdr = null
   device.value = ''
-  await new Promise(r => setTimeout(r, 1000 / BUFS_PER_SEC + 10))
-  toClose.close()
+  if (toClose) {
+    await new Promise(r => setTimeout(r, 1000 / BUFS_PER_SEC + 10))
+    toClose.close()
+  }
 }
 
 export async function receive() {
