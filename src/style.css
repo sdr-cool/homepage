@@ -6,13 +6,15 @@
 
   color-scheme: light dark;
   color: #213547;
-  background-color: #ffffff;
+  background-color: #1a1a1a;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+
+  --app-height: 100vh;
 }
 
 a {
@@ -38,7 +40,7 @@ body {
   display: flex;
   place-items: center;
   min-width: 320px;
-  min-height: 100vh;
+  min-height: var(--app-height);
   background-color: #1a1a1a;
 }
 
