@@ -39,7 +39,6 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  min-height: -webkit-fill-available;
   background-color: #1a1a1a;
 }
 
