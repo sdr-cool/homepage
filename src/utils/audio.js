@@ -56,9 +56,13 @@ function Player() {
     var source = ac.createBufferSource();
     source.buffer = buffer;
     source.connect(gainNode);
-    lastPlayedAt = Math.max(
-        lastPlayedAt + leftSamples.length / OUT_RATE,
-        ac.currentTime + TIME_BUFFER);
+    if (lastPlayedAt > ac.currentTime) {
+      lastPlayedAt = ac.currentTime
+    } else {
+      lastPlayedAt = Math.max(
+          lastPlayedAt + leftSamples.length / OUT_RATE,
+          ac.currentTime + TIME_BUFFER);
+    }
     source.start(lastPlayedAt);
   }
 

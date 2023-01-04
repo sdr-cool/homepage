@@ -36,7 +36,7 @@ export async function connect() {
 
       const left = new Float32Array(data, 0, sz / 4)
       const right = new Float32Array(data, sz, sz / 4)
-      if (Date.now() - connTs > 1000) player.play(left, right, sl, mode.value === 'FM' ? 0.15 : sl / 10)
+      if (connTs > 0 && Date.now() - connTs > 1000) player.play(left, right, sl, mode.value === 'FM' ? 0.15 : sl / 10)
 
       latency.value = Date.now() - dv.getFloat64(sz * 2 + 8) + tsOffset
       const freqR = dv.getUint32(sz * 2 + 16)
