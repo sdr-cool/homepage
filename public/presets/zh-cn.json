@@ -8,7 +8,7 @@
         "name": "FM",
         "expand": true,
         "items": [
-          { "name": "Easy FM", "mode": "FM", "frequency": "88.7" },
+          { "name": "Hit FM", "mode": "FM", "frequency": "88.7" },
           { "name": "北京新闻广播", "mode": "FM", "frequency": "94.5" },
           { "name": "北京音乐广播", "mode": "FM", "frequency": "97.4" }
         ]
