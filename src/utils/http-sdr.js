@@ -1,14 +1,17 @@
 import { watch } from 'vue'
 import { getInstance } from './audio'
+import Decoder from './decode-worker'
 import { mode, frequency, tuningFreq, latency, device, totalReceived, setSignalLevel } from './sdr-vals'
 
 let ws = null
 let player = null
+let decoder = null
 let error = null
 
 const url = import.meta.env.PROD ? `ws://${location.host}/data` : `ws://${location.hostname}:3000/data`
 
 export async function connect() {
+  decoder = decoder || new Decoder()
   player = getInstance()
   error = null
   ws = new WebSocket(url)
@@ -28,20 +31,23 @@ export async function connect() {
   ws.addEventListener('message', ({ data }) => {
     if (data instanceof ArrayBuffer) {
       totalReceived.value += data.byteLength
-      const sz = (data.byteLength - 16 - 4) / 2
+      if (connTs === 0 || Date.now() - connTs < 1000) return
 
-      const dv = new DataView(data)
-      const sl = dv.getFloat64(sz * 2)
+      const sz = data.byteLength - 8 - 4
+      const samples = data.slice(0, sz)
+
+      let [left, right, sl] = decoder.process(samples, true, -tuningFreq.value)
+      left = new Float32Array(left);
+      right = new Float32Array(right);
+      player.play(left, right, sl, mode.value === 'FM' ? 0.15 : sl / 10);
       setSignalLevel(sl)
 
-      const left = new Float32Array(data, 0, sz / 4)
-      const right = new Float32Array(data, sz, sz / 4)
-      if (connTs > 0 && Date.now() - connTs > 1000) player.play(left, right, sl, mode.value === 'FM' ? 0.15 : sl / 10)
+      const dv = new DataView(data)
+      const ts = dv.getFloat64(sz)
+      const freqR = dv.getUint32(sz + 8)
+      latency.value = Date.now() - ts + tsOffset
 
-      latency.value = Date.now() - dv.getFloat64(sz * 2 + 8) + tsOffset
-      const freqR = dv.getUint32(sz * 2 + 16)
-
-      if (frequency.value + tuningFreq.value === freqR) {
+      if (frequency.value === freqR) {
         if (sl > 0.5 && tuningFreq.value !== 0) {
           frequency.value = frequency.value + tuningFreq.value
           tuningFreq.value = 0
@@ -91,9 +97,9 @@ watch(frequency, () => {
   ws.send(JSON.stringify({ type: 'frequency', frequency: frequency.value, tuningFreq: tuningFreq.value  }))
 })
 
-watch(tuningFreq, () => {
-  ws.send(JSON.stringify({ type: 'frequency', frequency: frequency.value, tuningFreq: tuningFreq.value  }))
-})
+// watch(tuningFreq, () => {
+//   ws.send(JSON.stringify({ type: 'frequency', frequency: frequency.value, tuningFreq: tuningFreq.value  }))
+// })
 
 watch(mode, newMode => {
   ws.send(JSON.stringify({ type: 'mode', mode: newMode  }))
