@@ -102,5 +102,6 @@ watch(frequency, () => {
 // })
 
 watch(mode, newMode => {
+  decoder.setMode(newMode)
   ws.send(JSON.stringify({ type: 'mode', mode: newMode  }))
 })
