@@ -23,14 +23,11 @@ import Demodulator_SSB from './demodulator-ssb.js';
 import Demodulator_NBFM from './demodulator-nbfm.js';
 import Demodulator_WBFM from './demodulator-wbfm.js';
 
-var IN_RATE = 1024000;
-var OUT_RATE = 48000;
-
 /**
  * A class to implement a worker that demodulates an FM broadcast station.
  * @constructor
  */
-function Decoder() {
+function Decoder(IN_RATE = 1024 * 1e3, OUT_RATE = 48000) {
   var demodulator = new Demodulator_WBFM(IN_RATE, OUT_RATE);
   var cosine = 1;
   var sine = 0;

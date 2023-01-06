@@ -16,8 +16,7 @@
  * A class to play a series of sample buffers at a constant rate.
  * @constructor
  */
-function Player() {
-  var OUT_RATE = 48000;
+function Player(OUT_RATE=48000) {
   var TIME_BUFFER = 0;
   var SQUELCH_TAIL = 0.3;
 
