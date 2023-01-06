@@ -11,7 +11,7 @@ let error = null
 const url = import.meta.env.PROD ? `ws://${location.host}/data` : `ws://${location.hostname}:3000/data`
 
 export async function connect() {
-  decoder = decoder || new Decoder()
+  decoder = decoder || new Decoder(256 * 1e3)
   player = getInstance()
   error = null
   ws = new WebSocket(url)
