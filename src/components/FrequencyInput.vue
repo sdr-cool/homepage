@@ -29,7 +29,7 @@ function setFrequency() {
 
 <template>
 <div class="container" v-if="modelValue">
-  <input v-model="inputVal" type="number" />
+  <input v-model="inputVal" type="number" step="0.01" />
   <div class="unit">MHz</div>
   <button @click="setFrequency">OK</button>
 </div>
