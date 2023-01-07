@@ -60,7 +60,7 @@ function Player(OUT_RATE=48000) {
     } else {
       lastPlayedAt = Math.max(
           lastPlayedAt + leftSamples.length / OUT_RATE,
-          ac.currentTime + TIME_BUFFER);
+          ac.currentTime + leftSamples.length / OUT_RATE * 0.3);
     }
     source.start(lastPlayedAt);
   }
