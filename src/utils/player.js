@@ -25,7 +25,7 @@ class SpPlayer {
     this.right = []
     this.cur = 0
 
-    const bufferSize = 512;
+    const bufferSize = 256;
     const sp = this._ac.createScriptProcessor(bufferSize, 1, 2)
     sp.onaudioprocess = ({ outputBuffer }) => {
       if (this.left.length > 0) {
