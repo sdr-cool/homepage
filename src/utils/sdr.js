@@ -1,9 +1,9 @@
 import _ from 'lodash'
 import { ref, watch } from 'vue'
 
-import RtlSdr from 'rtlsdrjs'
-import Decoder from './decode-worker'
-import { getInstance } from './audio'
+import RtlSdr from '@sdr.cool/rtlsdrjs'
+import decoder from '@sdr.cool/demodulator-wasm'
+import { getInstance } from './player'
 
 import { mode, frequency, tuningFreq, latency, setSignalLevel, device, totalReceived } from './sdr-vals'
 
@@ -14,7 +14,6 @@ const MIN_FREQ = 5e5
 const MAX_FREQ = 8e8
 
 let sdr = null
-let decoder = null
 let player = null
 
 const save = _.debounce(() => {
@@ -43,7 +42,6 @@ export async function disconnect() {
 }
 
 export async function receive() {
-  decoder = decoder || new Decoder()
   decoder.setMode(mode.value)
 
   player = getInstance()
@@ -88,7 +86,7 @@ window.addEventListener('message', ({ data }) => {
     case 'samples':
       const samples = data.samples
       totalReceived.value += samples.byteLength
-      let [left, right, sl] = decoder.process(samples, true, -tuningFreq.value)
+      let [left, right, sl] = decoder.demodulate(samples, -tuningFreq.value)
 
       if (frequency.value === data.frequency) {
         if (sl > 0.5 && tuningFreq.value !== 0) {

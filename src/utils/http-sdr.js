@@ -1,13 +1,12 @@
 import { watch } from 'vue'
-import { getInstance } from './audio'
+import { getInstance } from './player'
 import { mode, frequency, tuningFreq, latency, device, totalReceived, setSignalLevel } from './sdr-vals'
 
 let ws = null
 let player = null
 let error = null
 
-// const url = import.meta.env.PROD ? `ws://${location.host}/data` : `ws://${location.hostname}:3000/data`
-const url = 'ws://6.6.6.6/data'
+const url = import.meta.env.PROD ? `ws://${location.host}/data` : `ws://${location.hostname}:3000/data`
 
 export async function connect() {
   player = getInstance()

@@ -4,7 +4,7 @@ import { mode, frequency, tuningFreq, latency, signalLevel, device, totalReceive
 import ModeSelect from './components/ModeSelect.vue'
 import FrequencyInput from './components/FrequencyInput.vue'
 import Bookmarks from './components/Bookmarks.vue'
-import { init as initPlayer } from './utils/audio'
+import { init as initPlayer } from './utils/player'
 
 let connect, disconnect, receive
 

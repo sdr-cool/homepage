@@ -8,12 +8,14 @@
     "dev-sdr-proxy": "VITE_SDR_PROXY=true vite --host",
     "build": "vite build",
     "build-sdr-proxy": "VITE_SDR_PROXY=true vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "echo export default Module >> node_modules/@sdr.cool/demodulator-wasm/src/demodulator_wasm.js && cp node_modules/@sdr.cool/demodulator-wasm/src/demodulator_wasm.wasm public/"
   },
   "dependencies": {
+    "@sdr.cool/demodulator-wasm": "^0.1.1",
+    "@sdr.cool/rtlsdrjs": "^0.1.0",
     "axios": "^1.2.2",
     "lodash": "^4.17.21",
-    "rtlsdrjs": "^0.0.0",
     "sass": "^1.57.1",
     "vue": "^3.2.45"
   },
