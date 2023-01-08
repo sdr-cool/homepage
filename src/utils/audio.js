@@ -115,5 +115,5 @@ function Player(OUT_RATE=48000) {
 }
 
 let instance = null
-export function init() { if (!instance) instance = new Player(); }
+export function init(OUT_RATE) { if (!instance) instance = new Player(OUT_RATE); }
 export function getInstance() { return instance; }
