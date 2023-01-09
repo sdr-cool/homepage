@@ -25,7 +25,7 @@ class SpPlayer {
     this.right = []
     this.cur = 0
 
-    const bufferSize = 256;
+    const bufferSize = 2048
     const sp = this._ac.createScriptProcessor(bufferSize, 1, 2)
     sp.onaudioprocess = ({ outputBuffer }) => {
       if (this.left.length > 0) {
@@ -33,12 +33,12 @@ class SpPlayer {
         const right = outputBuffer.getChannelData(1)
 
         this.fill(left, this.left)
-        const block0end = this.fill(right, this.right)
+        const blockRaed = this.fill(right, this.right)
         this.cur += left.length
-        if (block0end) {
-          this.left.shift()
-          this.right.shift()
-          this.cur = this.left.length > 0 ? this.cur - this.left[0].length : 0
+        if (blockRaed > 0) {
+          this.left = this.left.slice(blockRaed)
+          this.right = this.right.slice(blockRaed)
+          this.cur = this.left.length > 0 ? this.cur - blockRaed * this.left[0].length : 0
         }
       }
     }
@@ -49,18 +49,18 @@ class SpPlayer {
   }
 
   fill(out, src) {
-    const sub = src[0].subarray(this.cur, this.cur + out.length)
-    out.set(sub)
-    if (sub.length < out.length) {
-      if (src.length > 1) out.set(src[1].subarray(0, out.length - sub.length), sub.length)
-      return true
+    let read = 0, i = 0
+    for (; read < out.length && i < src.length; i++) {
+      const sub = src[i].subarray(this.cur + read - i * src[0].length, this.cur - i * src[0].length + out.length)
+      out.set(sub, read)
+      read += sub.length
     }
 
-    return this.cur === src[0].length
+    return src[0].length * i > this.cur + read ? i - 1 : i
   }
 
   play(left, right) {
-    if (this.left.length > 3) {
+    if (this.left.length > 5) {
       this.left = [left]
       this.right = [right]
       this.cur = 0
