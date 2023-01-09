@@ -52,9 +52,11 @@ function size(sz) {
   <div class="cennter_console">
     <div v-if="!error && device" class="radio_info">
       <div class="freq" @click="showFreqInput = !showFreqInput">{{ ((frequency + tuningFreq) / 1e6).toFixed(2) }}</div>
-      <div class="mode" @click="showModeSelect = !showModeSelect">{{ mode }}</div>
-      <div class="signal_level">
-        <div class="bar" :style="{ height: signalLevel * 100 + '%'  }"></div>
+      <div class="info">
+        <div class="signal_level">
+          <div class="bar" :style="{ height: signalLevel * 100 + '%'  }"></div>
+        </div>
+        <div class="mode" @click="showModeSelect = !showModeSelect">{{ mode }}</div>
       </div>
     </div>
     <div v-if="error" class="error">
@@ -102,10 +104,10 @@ function size(sz) {
   .left, .right {
     button {
       display: block;
-      width: 35px;
+      width: 50px;
       height: 20px;
       line-height: 0;
-      padding: 18px 0;
+      padding: 25px 0;
     }
 
     :first-child {
@@ -166,10 +168,10 @@ function size(sz) {
     background-color: #364334;
     flex-grow: 2;
     // min-width: 220px;
-    height: 80px;
+    height: 107px;
 
     .error {
-        line-height: 80px;
+        line-height: 107px;
         font-size: 20px;
         font-weight: bold;
         animation: blinker 1s linear infinite;
@@ -182,30 +184,34 @@ function size(sz) {
     }
 
     .radio_info {
-      position: relative;
+      height: 100%;
+      display: flex;
+      place-items: center;
+
       .freq {
-        line-height: 80px;
         font-size: 60px;
         font-weight: bold;
         cursor: pointer;
+        margin-left: auto;
+      }
+
+      .info {
+        margin-left: 5px;
+        margin-right: auto;
       }
 
       .mode {
-        position: absolute;
-        right: 10px;
-        bottom: 10px;
         font-size: 15px;
         font-weight: bold;
         cursor: pointer;
       }
 
       .signal_level {
-        position: absolute;
-        right: 16px;
-        bottom: 35px;
+        position: relative;
         height: 30px;
         width: 10px;
         background-color: #3d7457;
+        margin: 0 auto;
 
         .bar {
           width: 100%;
