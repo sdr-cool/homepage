@@ -60,7 +60,7 @@ class SpPlayer {
   }
 
   play(left, right) {
-    if (this.left.length > 5) {
+    if (this.left.length > 3) {
       this.left = [left]
       this.right = [right]
       this.cur = 0
