@@ -13,8 +13,7 @@ const props = defineProps({
 <template>
 <div v-if="data.type === 'dir'" class="dir">
   <div @click="data.expand = !data.expand" class="title">
-    <span v-show="!data.expand">▸</span>
-    <span v-show="data.expand">▾</span>
+    <font-awesome-icon :icon="`fa-solid ${data.expand ? 'fa-folder-open' : 'fa-folder'}`" />
     {{ data.name }}
   </div>
   <div class="items" v-show="data.expand">
