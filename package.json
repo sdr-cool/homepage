@@ -12,6 +12,9 @@
     "postinstall": "echo export default Module >> node_modules/@sdr.cool/demodulator-wasm/src/demodulator_wasm.js && cp node_modules/@sdr.cool/demodulator-wasm/src/demodulator_wasm.wasm public/"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.2.1",
+    "@fortawesome/free-solid-svg-icons": "^6.2.1",
+    "@fortawesome/vue-fontawesome": "^3.0.2",
     "@sdr.cool/demodulator-wasm": "^0.1.1",
     "@sdr.cool/rtlsdrjs": "^0.1.0",
     "axios": "^1.2.2",

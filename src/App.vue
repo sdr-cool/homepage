@@ -46,8 +46,8 @@ function size(sz) {
 <template>
 <div class="panel">
   <div class="left">
-    <button :disabled="!device" @click="frequency -= 100000">‹</button>
-    <button :disabled="!device" @click="tuningFreq -= 100000">«</button>
+    <button :disabled="!device" @click="frequency -= 100000"><font-awesome-icon icon="fa-solid fa-angle-left" /></button>
+    <button :disabled="!device" @click="tuningFreq -= 100000"><font-awesome-icon icon="fa-solid fa-angles-left" /></button>
   </div>
   <div class="cennter_console">
     <div v-if="!error && device" class="radio_info">
@@ -64,21 +64,23 @@ function size(sz) {
     </div>
   </div>
   <div class="right">
-    <button :disabled="!device" @click="frequency += 100000">›</button>
-    <button :disabled="!device" @click="tuningFreq += 100000">»</button>
+    <button :disabled="!device" @click="frequency += 100000"><font-awesome-icon icon="fa-solid fa-angle-right" /></button>
+    <button :disabled="!device" @click="tuningFreq += 100000"><font-awesome-icon icon="fa-solid fa-angles-right" /></button>
   </div>
   <mode-select v-model="showModeSelect" />
   <frequency-input v-model="showFreqInput" />
   <div class="bottom">
     <div>
-      <button @click="connectSdr" v-if="!device">⏼</button>
-      <button @click="disconnect" v-if="device" class="active">⏼</button>
+      <button @click="connectSdr" v-if="!device"><font-awesome-icon icon="fa-solid fa-power-off" /></button>
+      <button @click="disconnect" v-if="device" class="active"><font-awesome-icon icon="fa-solid fa-power-off" /></button>
     </div>
     <div class="center">
       {{ device }}
     </div>
     <div>
-      <button style="font-size: 14px" v-if="device" @click="showBookmarks = !showBookmarks" :class="{ active: showBookmarks }">☆</button>
+      <button style="font-size: 14px" v-if="device" @click="showBookmarks = !showBookmarks" :class="{ active: showBookmarks }">
+        <font-awesome-icon icon="fa-solid fa-star" />
+      </button>
     </div>
   </div>
   <bookmarks v-show="device && showBookmarks" />
@@ -105,12 +107,11 @@ function size(sz) {
     button {
       display: block;
       width: 50px;
-      height: 20px;
       line-height: 0;
-      padding: 25px 0;
+      padding: 17px 0;
     }
 
-    :first-child {
+    > :first-child {
       margin-bottom: 4px;
     }
   }
