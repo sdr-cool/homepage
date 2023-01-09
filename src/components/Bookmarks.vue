@@ -18,7 +18,7 @@ axios.get('/presets/zh-cn.json').then(({ data }) => presets.value = data)
 .bookmark {
   margin: 10px auto;
   min-width: 200px;
-  padding: 10px;
+  padding: 0 10px 10px 10px;
   background-color: #eee;
 }
 </style>

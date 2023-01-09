@@ -21,7 +21,7 @@ const props = defineProps({
   </div>
 </div>
 <div v-else class="item" @click="mode = data.mode, frequency = data.frequency * 1e6, tuningFreq = 0">
-  {{ data.name }} {{  data.mode }} {{ data.frequency }}
+  <font-awesome-icon icon="fa-solid fa-radio" v-if="frequency === data.frequency * 1e6" /> {{ data.name }} {{  data.mode }} {{ data.frequency }}
 </div>
 </template>
 
@@ -31,6 +31,7 @@ const props = defineProps({
 
   .title {
     cursor: pointer;
+    padding-top: 10px;
   }
 
   .items {
@@ -40,7 +41,11 @@ const props = defineProps({
 
 .item {
   text-align: left;
-  margin: 5px 0;
+  margin: 10px 0;
   cursor: pointer;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 </style>
