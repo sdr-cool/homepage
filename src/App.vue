@@ -125,7 +125,7 @@ function size(sz) {
 
   .bottom {
     width: 100%;
-    margin-top: 10px;
+    margin-top: 15px;
     display: flex;
     align-items: center;
 
@@ -134,8 +134,8 @@ function size(sz) {
     }
 
     button {
-      padding: 10px 0;
-      width: 40px;
+      padding: 15px 0;
+      width: 50px;
 
       &.active {
         background-color: #ccc;
