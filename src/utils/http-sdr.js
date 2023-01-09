@@ -7,6 +7,7 @@ let player = null
 let error = null
 
 const url = import.meta.env.PROD ? `ws://${location.host}/data` : `ws://${location.hostname}:3000/data`
+// const url = 'ws://6.6.6.6/data'
 
 export async function connect() {
   player = getInstance()

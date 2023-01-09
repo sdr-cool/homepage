@@ -28,7 +28,7 @@ class WhiteNoiseProcessor extends AudioWorkletProcessor {
       return true
     }
 
-    return this.cur === src[0].length
+    return this.cur + out.length === src[0].length
   }
 
   process(inputs, outputs, parameters) {
@@ -42,7 +42,7 @@ class WhiteNoiseProcessor extends AudioWorkletProcessor {
         this.right.shift()
         this.cur = this.left.length > 0 ? this.cur - this.left[0].length : 0
       }
-    }
+    } else { console.log(0) }
     return true;
   }
 }
