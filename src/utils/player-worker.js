@@ -1,5 +1,4 @@
-import { decoder } from '@sdr.cool/utils'
-import { RingBuffer } from '@sdr.cool/utils'
+import { decoder, RingBuffer } from '@sdr.cool/utils'
 
 class SdrProcessor extends AudioWorkletProcessor {
   constructor(...args) {
