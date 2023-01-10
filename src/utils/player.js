@@ -1,18 +1,30 @@
 import { AUDIO_SAMPLE_RATE } from './sdr-vals'
+import sdrWorklet from './player-worker.js?url'
 
 class Player {
   constructor() {
-    const ac = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: AUDIO_SAMPLE_RATE });
-    ac.audioWorklet.addModule('audio-worklet.js').then(() => {
-      const sdr = new AudioWorkletNode(ac, 'sdr-worklet', { outputChannelCount: [2] });
-      sdr.connect(ac.destination);
-      this._ac = ac;
-      this._port = sdr.port;
+    const ac = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: AUDIO_SAMPLE_RATE })
+    ac.audioWorklet.addModule(sdrWorklet).then(() => {
+      const sdr = new AudioWorkletNode(ac, 'sdr-worklet', { outputChannelCount: [2] })
+      sdr.connect(ac.destination)
+      this._ac = ac
+      this._port = sdr.port
+
+      this._port.onmessage = function () {}
     });
   }
 
   play(left, right, level, squelch) {
-    this._port.postMessage([left, right]);
+    this._port.postMessage({ type: 'audio', left, right })
+  }
+
+  setMode(mode) {
+    this._port.postMessage({ type: 'set_mode', mode })
+  }
+
+  playRaw(raw, tuningFreq) {
+    this._port.postMessage({ type: 'raw', raw, tuningFreq })
+    return new Promise(r => this._port.addEventListener('message', ({ data }) => r(data), { once: true }))
   }
 }
 
@@ -59,7 +71,7 @@ class SpPlayer {
     return src[0].length * i > this.cur + read ? i - 1 : i
   }
 
-  play(left, right) {
+  async play(left, right) {
     if (this.left.length > 3) {
       this.left = [left]
       this.right = [right]
@@ -74,7 +86,7 @@ class SpPlayer {
 let instance = null
 export function init() {
   if (!instance) {
-    instance = location.protocol === 'https:' ? new Player() : new SpPlayer()
+    instance = location.protocol === 'https:' ? new Player() : new Player()
   }
 }
 

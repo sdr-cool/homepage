@@ -2,7 +2,6 @@ import _ from 'lodash'
 import { ref, watch } from 'vue'
 
 import RtlSdr from '@sdr.cool/rtlsdrjs'
-import decoder from '@sdr.cool/demodulator-wasm'
 import { getInstance } from './player'
 
 import { mode, frequency, tuningFreq, latency, setSignalLevel, device, totalReceived } from './sdr-vals'
@@ -42,9 +41,9 @@ export async function disconnect() {
 }
 
 export async function receive() {
-  decoder.setMode(mode.value)
-
   player = getInstance()
+  player.setMode(mode.value)
+
   await sdr.open({ ppm: 0.5 })
   await sdr.setSampleRate(SAMPLE_RATE)
   await sdr.setCenterFrequency(frequency.value)
@@ -58,7 +57,8 @@ export async function receive() {
     }
     const samples = await sdr.readSamples(SAMPLES_PER_BUF)
     if (samples.byteLength > 0) {
-      postMessage({ type: 'samples', samples, ts: Date.now(), frequency: currentFreq })
+      // postMessage({ type: 'samples', samples, ts: Date.now(), frequency: currentFreq })
+      processSamples(samples)
     }
   }
 }
@@ -75,45 +75,18 @@ watch(frequency, async newFreq => {
 })
 
 watch(mode, newMode => {
-  if (decoder) {
-    decoder.setMode(newMode)
+  if (player) {
+    player.setMode(newMode)
     save()
   }
 })
 
-window.addEventListener('message', ({ data }) => {
-  switch (data.type) {
-    case 'samples':
-      const samples = data.samples
-      totalReceived.value += samples.byteLength
-      let [left, right, sl] = decoder.demodulate(samples, -tuningFreq.value)
+async function processSamples(samples) {
+  const start = Date.now()
+  const freq = frequency.value
+  const tuFreq = tuningFreq.value
+  totalReceived.value += samples.byteLength
+  const sl = await player.playRaw(samples, tuFreq)
 
-      if (frequency.value === data.frequency) {
-        if (sl > 0.5 && tuningFreq.value !== 0) {
-          frequency.value = frequency.value + tuningFreq.value
-          tuningFreq.value = 0
-        } else if (tuningFreq.value > 0) {
-          if (tuningFreq.value < 300000) {
-            tuningFreq.value += 100000
-          } else {
-            frequency.value = frequency.value + tuningFreq.value
-            tuningFreq.value = 100000
-          }
-        } else if (tuningFreq.value < 0) {
-          if (tuningFreq.value > -300000) {
-            tuningFreq.value -= 100000
-          } else {
-            frequency.value = frequency.value + tuningFreq.value
-            tuningFreq.value = -100000
-          }
-        }
-      }
-
-      setSignalLevel(sl)
-      left = new Float32Array(left);
-      right = new Float32Array(right);
-      player.play(left, right, sl, mode.value === 'FM' ? 0.15 : sl / 10);
-      latency.value = Date.now() - data.ts
-      break;
-  }
-})
+  setSignalLevel(sl)
+}
