@@ -1,4 +1,4 @@
-import decoder from '@sdr.cool/demodulator-wasm'
+import { decoder } from '@sdr.cool/utils'
 import { RingBuffer } from '@sdr.cool/utils'
 
 class SdrProcessor extends AudioWorkletProcessor {
@@ -11,14 +11,14 @@ class SdrProcessor extends AudioWorkletProcessor {
 
     this.buffer = new RingBuffer(2400, 2)
 
-    this.port.onmessage = ({ data: { type, mode, raw, tuningFreq, left, right } }) => {
+    this.port.onmessage = ({ data: { type, mode, raw, frequency, tuningFreq, left, right } }) => {
       if (type === 'set_mode') {
         return decoder.setMode(mode)
       }
 
       if (raw) {
-        const [dl, dr, signalLevel ] = decoder.demodulate(raw, -tuningFreq)
-        this.port.postMessage(signalLevel)
+        const [dl, dr, signalLevel, tuning] = decoder.decode(raw, frequency, tuningFreq)
+        this.port.postMessage([signalLevel, tuning])
         left = new Float32Array(dl)
         right = new Float32Array(dr)
       }

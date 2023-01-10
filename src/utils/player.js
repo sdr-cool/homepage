@@ -22,8 +22,8 @@ class Player {
     this._port.postMessage({ type: 'set_mode', mode })
   }
 
-  playRaw(raw, tuningFreq) {
-    this._port.postMessage({ type: 'raw', raw, tuningFreq })
+  playRaw(raw, frequency, tuningFreq) {
+    this._port.postMessage({ type: 'raw', raw, frequency, tuningFreq })
     return new Promise(r => this._port.addEventListener('message', ({ data }) => r(data), { once: true }))
   }
 }

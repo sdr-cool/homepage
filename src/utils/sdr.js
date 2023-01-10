@@ -55,10 +55,11 @@ export async function receive() {
       await sdr.setCenterFrequency(frequency.value)
       await sdr.resetBuffer()
     }
+
+    const currentTuning = tuningFreq.value
     const samples = await sdr.readSamples(SAMPLES_PER_BUF)
     if (samples.byteLength > 0) {
-      // postMessage({ type: 'samples', samples, ts: Date.now(), frequency: currentFreq })
-      processSamples(samples)
+      processSamples(samples, currentFreq, currentTuning)
     }
   }
 }
@@ -81,12 +82,16 @@ watch(mode, newMode => {
   }
 })
 
-async function processSamples(samples) {
+async function processSamples(samples, f, t) {
   const start = Date.now()
-  const freq = frequency.value
-  const tuFreq = tuningFreq.value
   totalReceived.value += samples.byteLength
-  const sl = await player.playRaw(samples, tuFreq)
+
+  const [sl, tuning] = await player.playRaw(samples, f, t)
+  if (tuning) {
+    frequency.value = tuning.frequency
+    tuningFreq.value = tuning.tuningFreq
+  }
 
   setSignalLevel(sl)
+  latency.value = Date.now() - start
 }
