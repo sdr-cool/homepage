@@ -1,18 +1,16 @@
 import { watch } from 'vue'
 import { proto } from '@sdr.cool/utils'
 import { getInstance } from './player'
-import { mode, frequency, tuningFreq, latency, device, totalReceived, setSignalLevel } from './sdr-vals'
+import { error, mode, frequency, tuningFreq, latency, device, totalReceived, setSignalLevel } from './sdr-vals'
 
 let ws = null
 let player = null
-let error = null
 
 const url = import.meta.env.PROD ? `ws://${location.host}/data` : `ws://${location.hostname}:3000/data`
 // const url = 'ws://6.6.6.6/data'
 
 export async function connect() {
   player = getInstance()
-  error = null
   ws = new WebSocket(url)
   ws.binaryType = "arraybuffer"
   device.value = url
@@ -24,8 +22,8 @@ export async function connect() {
     ws.send(JSON.stringify({ type: 'init' }))
   })
 
-  ws.addEventListener('error', () => error = `Connect to ${url} failed.`)
-  ws.addEventListener('close', () => error = `Stream ${url} closed.`)
+  ws.addEventListener('error', () => error.value = `Connect to ${url} failed.`)
+  ws.addEventListener('close', () => { if (ws) error.value = `Stream ${url} closed.` })
 
   ws.addEventListener('message', ({ data }) => {
     if (data instanceof ArrayBuffer) {
@@ -52,13 +50,6 @@ export async function disconnect() {
 
   await new Promise(r => setTimeout(r, 100))
   if (toClose) toClose.close()
-}
-
-export async function receive() {
-  while (ws) {
-    await new Promise(r => setTimeout(r, 100))
-    if (error) throw error
-  }
 }
 
 watch(frequency, () => {

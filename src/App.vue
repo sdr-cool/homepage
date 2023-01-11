@@ -6,7 +6,7 @@ import FrequencyInput from './components/FrequencyInput.vue'
 import Bookmarks from './components/Bookmarks.vue'
 import { init as initPlayer } from './utils/player'
 
-let connect, disconnect, receive
+let connect, disconnect
 
 const debug = ref(false)
 const showModeSelect = ref(false)
@@ -18,14 +18,13 @@ async function connectSdr() {
   const module = import.meta.env.VITE_SDR_PROXY ? await import('./utils/http-sdr.js') : await import('./utils/sdr.js')
   connect = module.connect
   disconnect = module.disconnect
-  receive = module.receive
 
   error.value = null
   connect()
 }
 
-watch(error, () => {
-  disconnect()
+watch(error, err => {
+  if (err) disconnect()
 })
 
 function size(sz) {
