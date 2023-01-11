@@ -1,4 +1,5 @@
 import { watch } from 'vue'
+import { proto } from '@sdr.cool/utils'
 import { getInstance } from './player'
 import { mode, frequency, tuningFreq, latency, device, totalReceived, setSignalLevel } from './sdr-vals'
 
@@ -29,39 +30,10 @@ export async function connect() {
   ws.addEventListener('message', ({ data }) => {
     if (data instanceof ArrayBuffer) {
       totalReceived.value += data.byteLength
-      const sz = (data.byteLength - 16 - 4) / 2
+      const { left, right, signalLevel } = proto.decode(new Uint8Array(data))
 
-      const dv = new DataView(data)
-      const sl = Math.max(0, dv.getFloat64(sz * 2))
-      setSignalLevel(sl)
-
-      const left = new Float32Array(data, 0, sz / 4)
-      const right = new Float32Array(data, sz, sz / 4)
-      if (connTs > 0 && Date.now() - connTs > 1000) player.play(left, right, sl, mode.value === 'FM' ? 0.15 : sl / 10)
-
-      latency.value = Date.now() - dv.getFloat64(sz * 2 + 8) + tsOffset
-      const freqR = dv.getUint32(sz * 2 + 16)
-
-      if (frequency.value + tuningFreq.value === freqR) {
-        if (sl > 0.5 && tuningFreq.value !== 0) {
-          frequency.value = frequency.value + tuningFreq.value
-          tuningFreq.value = 0
-        } else if (tuningFreq.value > 0) {
-          if (tuningFreq.value < 300000) {
-            tuningFreq.value += 100000
-          } else {
-            frequency.value = frequency.value + tuningFreq.value
-            tuningFreq.value = 100000
-          }
-        } else if (tuningFreq.value < 0) {
-          if (tuningFreq.value > -300000) {
-            tuningFreq.value -= 100000
-          } else {
-            frequency.value = frequency.value + tuningFreq.value
-            tuningFreq.value = -100000
-          }
-        }
-      }
+      setSignalLevel(signalLevel)
+      player.play(left, right)
     } else {
       const info = JSON.parse(data)
       tsOffset = Math.round(info.ts - (connTs + Date.now()) / 2 + (Date.now() - connTs) / 2)
