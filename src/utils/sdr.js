@@ -2,7 +2,7 @@ import _ from 'lodash'
 import { watch } from 'vue'
 import { sdrLoop } from '@sdr.cool/utils'
 
-import { getInstance } from './player'
+import { Player } from './player'
 
 import { error, mode, frequency, tuningFreq, latency, setSignalLevel, device, totalReceived } from './sdr-vals'
 
@@ -19,7 +19,7 @@ export async function connect() {
     frequency.value = saved.frequency
   } catch { }
 
-  player = getInstance()
+  player = player || new Player()
   sdrLoop.start(processSamples, () => tuningFreq.value).catch(e => error.value = e)
   device.value = await sdrLoop.getDevice()
   player.setMode(mode.value)

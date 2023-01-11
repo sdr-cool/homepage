@@ -1,7 +1,7 @@
 import { watch } from 'vue'
 import { proto } from '@sdr.cool/utils'
-import { getInstance } from './player'
 import { error, mode, frequency, tuningFreq, latency, device, totalReceived, setSignalLevel } from './sdr-vals'
+import { ScriptProcessorPlayer } from '@sdr.cool/utils/fe/ScriptProcessorPlayer.mjs'
 
 let ws = null
 let player = null
@@ -18,7 +18,7 @@ function remoteSetInfo(fn) {
 }
 
 export async function connect() {
-  player = getInstance()
+  player = player || new ScriptProcessorPlayer()
   ws = new WebSocket(url)
   ws.binaryType = "arraybuffer"
   device.value = url
