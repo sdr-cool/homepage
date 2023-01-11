@@ -1,6 +1,6 @@
 <script setup>
-import { ref } from 'vue'
-import { mode, frequency, tuningFreq, latency, signalLevel, device, totalReceived } from './utils/sdr-vals'
+import { ref, watch } from 'vue'
+import { error, mode, frequency, tuningFreq, latency, signalLevel, device, totalReceived } from './utils/sdr-vals'
 import ModeSelect from './components/ModeSelect.vue'
 import FrequencyInput from './components/FrequencyInput.vue'
 import Bookmarks from './components/Bookmarks.vue'
@@ -8,7 +8,6 @@ import { init as initPlayer } from './utils/player'
 
 let connect, disconnect, receive
 
-const error = ref(null)
 const debug = ref(false)
 const showModeSelect = ref(false)
 const showFreqInput = ref(false)
@@ -22,15 +21,12 @@ async function connectSdr() {
   receive = module.receive
 
   error.value = null
-  try {
-    await connect()
-    await receive()
-  } catch (e) {
-    error.value = e.message || e.toString()
-    console.error(e)
-    disconnect()
-  }
+  connect()
 }
+
+watch(error, () => {
+  disconnect()
+})
 
 function size(sz) {
   sz /= 1024 * 1024

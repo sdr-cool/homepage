@@ -1,18 +1,11 @@
 import _ from 'lodash'
-import { ref, watch } from 'vue'
+import { watch } from 'vue'
+import { sdrLoop } from '@sdr.cool/utils'
 
-import RtlSdr from '@sdr.cool/rtlsdrjs'
 import { getInstance } from './player'
 
-import { mode, frequency, tuningFreq, latency, setSignalLevel, device, totalReceived } from './sdr-vals'
+import { error, mode, frequency, tuningFreq, latency, setSignalLevel, device, totalReceived } from './sdr-vals'
 
-const SAMPLE_RATE = 1024 * 1e3 // Must be a multiple of 512 * BUFS_PER_SEC
-const BUFS_PER_SEC = 100
-const SAMPLES_PER_BUF = Math.floor(SAMPLE_RATE / BUFS_PER_SEC)
-const MIN_FREQ = 5e5
-const MAX_FREQ = 8e8
-
-let sdr = null
 let player = null
 
 const save = _.debounce(() => {
@@ -20,58 +13,26 @@ const save = _.debounce(() => {
 }, 1000)
 
 export async function connect() {
-  sdr = await RtlSdr.requestDevice()
-  device.value = sdr._usbDevice._device.productName
-
   try {
     const saved = JSON.parse(localStorage.getItem('sdr_state'))
     mode.value = saved.mode
     frequency.value = saved.frequency
   } catch { }
+
+  player = getInstance()
+  sdrLoop.start(processSamples, () => tuningFreq.value).catch(e => error.value = e)
+  device.value = await sdrLoop.getDevice()
+  player.setMode(mode.value)
 }
 
 export async function disconnect() {
-  const toClose = sdr
-  sdr = null
+  await sdrLoop.stop()
   device.value = ''
-  if (toClose) {
-    await new Promise(r => setTimeout(r, 1000 / BUFS_PER_SEC + 10))
-    toClose.close()
-  }
-}
-
-export async function receive() {
-  player = getInstance()
-  player.setMode(mode.value)
-
-  await sdr.open({ ppm: 0.5 })
-  await sdr.setSampleRate(SAMPLE_RATE)
-  await sdr.setCenterFrequency(frequency.value)
-  await sdr.resetBuffer()
-  let currentFreq = frequency.value
-  while (sdr) {
-    if (currentFreq !== frequency.value) {
-      currentFreq = frequency.value
-      await sdr.setCenterFrequency(frequency.value)
-      await sdr.resetBuffer()
-    }
-
-    const currentTuning = tuningFreq.value
-    const samples = await sdr.readSamples(SAMPLES_PER_BUF)
-    if (samples.byteLength > 0) {
-      processSamples(samples, currentFreq, currentTuning)
-    }
-  }
 }
 
 watch(frequency, async newFreq => {
-  if (newFreq < MIN_FREQ) {
-    frequency.value = MIN_FREQ
-    tuningFreq.value = 0
-  } else if (newFreq > MAX_FREQ) {
-    frequency.value = MAX_FREQ
-    tuningFreq.value = 0
-  }
+  const freq = sdrLoop.setFrequency(newFreq)
+  if (freq !== newFreq) frequency.value = freq
   save()
 })
 
