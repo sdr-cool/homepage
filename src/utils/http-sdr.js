@@ -7,7 +7,8 @@ let ws = null
 let player = null
 let remoteSettingInfo = false
 
-const url = import.meta.env.PROD ? `ws://${location.host}/data` : `ws://${location.hostname}:3000/data`
+const wsProto = location.protocol === 'https:' ? 'wss' : 'ws'
+const url = import.meta.env.PROD ? `${wsProto}://${location.host}/data` : `ws://${location.hostname}:3000/data`
 // const url = 'ws://6.6.6.6/data'
 
 function remoteSetInfo(fn) {
