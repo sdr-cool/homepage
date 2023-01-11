@@ -5,10 +5,16 @@ import { error, mode, frequency, tuningFreq, latency, device, totalReceived, set
 
 let ws = null
 let player = null
-let remoteSetInfo = false
+let remoteSettingInfo = false
 
 const url = import.meta.env.PROD ? `ws://${location.host}/data` : `ws://${location.hostname}:3000/data`
 // const url = 'ws://6.6.6.6/data'
+
+function remoteSetInfo(fn) {
+  remoteSettingInfo = true
+  fn()
+  setTimeout(() => remoteSettingInfo = false)
+}
 
 export async function connect() {
   player = getInstance()
@@ -29,24 +35,28 @@ export async function connect() {
   ws.addEventListener('message', ({ data }) => {
     if (data instanceof ArrayBuffer) {
       totalReceived.value += data.byteLength
-      const { left, right, signalLevel, frequency: f, tuningFreq: t } = proto.decode(new Uint8Array(data))
+      const { ts, left, right, signalLevel, mode: m, frequency: f, tuningFreq: t } = proto.decode(new Uint8Array(data))
+
+      if (!left || left.length === 0) {
+        remoteSetInfo(() => {
+          tsOffset = Math.round(ts - (connTs + Date.now()) / 2 + (Date.now() - connTs) / 2)
+          device.value = `${url} ${(Date.now() - connTs) / 2}ms`
+          mode.value = m
+          frequency.value = f
+          tuningFreq.value = t
+        })
+        return
+      }
 
       setSignalLevel(signalLevel)
       player.play(left, right)
 
       if (tuningFreq.value && (t || frequency.value !== f)) {
-        remoteSetInfo = true
-        frequency.value = f
-        tuningFreq.value = t
-        setTimeout(() => remoteSetInfo = false, 0)
+        remoteSetInfo(() => {
+          frequency.value = f
+          tuningFreq.value = t
+        })
       }
-    } else {
-      const info = JSON.parse(data)
-      tsOffset = Math.round(info.ts - (connTs + Date.now()) / 2 + (Date.now() - connTs) / 2)
-      device.value = `${url} ${(Date.now() - connTs) / 2}ms`
-      mode.value = info.mode
-      frequency.value = info.frequency
-      tuningFreq.value = info.tuningFreq
     }
   })
 }
@@ -61,13 +71,13 @@ export async function disconnect() {
 }
 
 watch(frequency, () => {
-  if (!remoteSetInfo) {
+  if (!remoteSettingInfo) {
     ws.send(JSON.stringify({ type: 'frequency', frequency: frequency.value, tuningFreq: tuningFreq.value  }))
   }
 })
 
 watch(tuningFreq, () => {
-  if (!remoteSetInfo) {
+  if (!remoteSettingInfo) {
     ws.send(JSON.stringify({ type: 'frequency', frequency: frequency.value, tuningFreq: tuningFreq.value  }))
   }
 })
