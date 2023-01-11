@@ -5,6 +5,7 @@ import { error, mode, frequency, tuningFreq, latency, device, totalReceived, set
 
 let ws = null
 let player = null
+let remoteSetInfo = false
 
 const url = import.meta.env.PROD ? `ws://${location.host}/data` : `ws://${location.hostname}:3000/data`
 // const url = 'ws://6.6.6.6/data'
@@ -28,10 +29,17 @@ export async function connect() {
   ws.addEventListener('message', ({ data }) => {
     if (data instanceof ArrayBuffer) {
       totalReceived.value += data.byteLength
-      const { left, right, signalLevel } = proto.decode(new Uint8Array(data))
+      const { left, right, signalLevel, frequency: f, tuningFreq: t } = proto.decode(new Uint8Array(data))
 
       setSignalLevel(signalLevel)
       player.play(left, right)
+
+      if (tuningFreq.value && (t || frequency.value !== f)) {
+        remoteSetInfo = true
+        frequency.value = f
+        tuningFreq.value = t
+        setTimeout(() => remoteSetInfo = false, 0)
+      }
     } else {
       const info = JSON.parse(data)
       tsOffset = Math.round(info.ts - (connTs + Date.now()) / 2 + (Date.now() - connTs) / 2)
@@ -53,11 +61,15 @@ export async function disconnect() {
 }
 
 watch(frequency, () => {
-  ws.send(JSON.stringify({ type: 'frequency', frequency: frequency.value, tuningFreq: tuningFreq.value  }))
+  if (!remoteSetInfo) {
+    ws.send(JSON.stringify({ type: 'frequency', frequency: frequency.value, tuningFreq: tuningFreq.value  }))
+  }
 })
 
 watch(tuningFreq, () => {
-  ws.send(JSON.stringify({ type: 'frequency', frequency: frequency.value, tuningFreq: tuningFreq.value  }))
+  if (!remoteSetInfo) {
+    ws.send(JSON.stringify({ type: 'frequency', frequency: frequency.value, tuningFreq: tuningFreq.value  }))
+  }
 })
 
 watch(mode, newMode => {

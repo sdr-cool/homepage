@@ -13,8 +13,8 @@ const props = defineProps({
 })
 
 watch(() => props.modelValue, v => {
+  tuningFreq.value = 0
   if (v) {
-    tuningFreq.value = 0
     inputVal.value = frequency.value / 1e6
   }
 })

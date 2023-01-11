@@ -42,7 +42,7 @@ function size(sz) {
 <div class="panel">
   <div class="left">
     <button :disabled="!device" @click="frequency -= 100000"><font-awesome-icon icon="fa-solid fa-angle-left" /></button>
-    <button :disabled="!device" @click="tuningFreq -= 100000"><font-awesome-icon icon="fa-solid fa-angles-left" /></button>
+    <button :disabled="!device" @click="tuningFreq = -100000"><font-awesome-icon icon="fa-solid fa-angles-left" /></button>
   </div>
   <div class="cennter_console">
     <div v-if="!error && device" class="radio_info">
@@ -60,7 +60,7 @@ function size(sz) {
   </div>
   <div class="right">
     <button :disabled="!device" @click="frequency += 100000"><font-awesome-icon icon="fa-solid fa-angle-right" /></button>
-    <button :disabled="!device" @click="tuningFreq += 100000"><font-awesome-icon icon="fa-solid fa-angles-right" /></button>
+    <button :disabled="!device" @click="tuningFreq = 100000"><font-awesome-icon icon="fa-solid fa-angles-right" /></button>
   </div>
   <mode-select v-model="showModeSelect" />
   <frequency-input v-model="showFreqInput" />
