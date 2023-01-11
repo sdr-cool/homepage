@@ -1,5 +1,5 @@
 import { AUDIO_SAMPLE_RATE } from './sdr-vals'
-import sdrWorklet from './player-worker.js?url'
+import sdrWorklet from './player-worker.js?url&worker'
 // import { ScriptProcessorPlayer } from '@sdr.cool/utils/fe/ScriptProcessorPlayer.mjs'
 
 class Player {
