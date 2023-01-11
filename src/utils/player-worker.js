@@ -8,7 +8,7 @@ class SdrProcessor extends AudioWorkletProcessor {
     this.right = []
     this.cur = 0
 
-    this.buffer = new RingBuffer(2048, 2)
+    this.buffer = new RingBuffer(4096, 2)
 
     this.port.onmessage = ({ data: { type, mode, raw, frequency, tuningFreq, left, right } }) => {
       if (type === 'set_mode') {
