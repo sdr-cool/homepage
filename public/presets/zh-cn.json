@@ -29,6 +29,15 @@
           { "name": "塔台2", "mode": "AM", "frequency": "118.5" },
           { "name": "塔台3", "mode": "AM", "frequency": "124.3" }
         ]
+      },{
+        "type": "dir",
+        "name": "成都双流",
+        "items": [
+          { "name": "塔台1", "mode": "AM", "frequency": "123.0" },
+          { "name": "塔台2", "mode": "AM", "frequency": "118.85" },
+          { "name": "塔台3", "mode": "AM", "frequency": "130.35" },
+          { "name": "TT", "mode": "AM", "frequency": "128.6" }
+        ]
       }
     ]
   }
